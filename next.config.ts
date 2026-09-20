@@ -38,6 +38,16 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }];
   },
+  async redirects() {
+    return [
+      { source: '/today', destination: '/reminders', permanent: true },
+      { source: '/people', destination: '/reminders?tab=people', permanent: true },
+      { source: '/studio', destination: '/cards', permanent: true },
+      { source: '/inventory', destination: '/my-cards', permanent: true },
+      { source: '/florists', destination: '/hq/partners', permanent: true },
+      { source: '/operations', destination: '/hq/operations', permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

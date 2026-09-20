@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 
 import { CardEditor } from '@/components/editor/CardEditor';
+import { ImportBox } from '@/components/people/ImportBox';
+import { LifeEventBox } from '@/components/people/LifeEventBox';
+import { PersonRow } from '@/components/people/PersonRow';
 import { PageHeader } from '@/components/shell/PageHeader';
 import { NewCardForm } from '@/components/today/NewCardForm';
 import { ProposalEnvelope } from '@/components/today/ProposalEnvelope';
@@ -11,6 +14,7 @@ import { fmtDate, daysLabel, plural } from '@/lib/format';
 import { serialize } from '@/lib/serialize';
 import { getAccountId } from '@/server/auth';
 import { now } from '@/server/clock';
+import { listPeople } from '@/server/services/people';
 import { getProposal, listProposals } from '@/server/services/proposals';
 
 export const metadata: Metadata = { title: 'Today' };
@@ -19,16 +23,37 @@ export const dynamic = 'force-dynamic';
 export default async function TodayPage({
   searchParams,
 }: {
-  searchParams: Promise<{ edit?: string; new?: string }>;
+  searchParams: Promise<{ edit?: string; new?: string; tab?: string }>;
 }) {
-  const { edit, new: newCard } = await searchParams;
+  const { edit, new: newCard, tab } = await searchParams;
   const accountId = await getAccountId();
   const today = now();
+  if (tab === 'people') {
+    const people = await listPeople(accountId, today);
+    return (
+      <div className="container-x section">
+        <PageHeader
+          title="People and dates"
+          lede="Everyone Dearly sends for you, their occasions and whether the address still checks out."
+        />
+        <div className="grid gap-4 lg:grid-cols-2">
+          <ImportBox />
+          <LifeEventBox />
+        </div>
+        <h2 className="section-title">Your people</h2>
+        <ul className="grid gap-3 lg:grid-cols-2" data-testid="people-list">
+          {people.map((p) => (
+            <PersonRow key={p.id} person={serialize(p)} />
+          ))}
+        </ul>
+      </div>
+    );
+  }
   const screen = await listProposals(accountId, today);
   const editing = edit ? await getProposal(edit, today) : null;
 
   return (
-    <>
+    <div className="container-x section">
       <PageHeader
         title="Today"
         lede={`Cards Dearly proposes for the next ${RULES.proposalWindowDays} days. Approve, edit or skip; the rest is done for you.`}
@@ -138,6 +163,6 @@ export default async function TodayPage({
       ) : null}
 
       {editing ? <CardEditor key={editing.key} proposal={serialize(editing)} /> : null}
-    </>
+    </div>
   );
 }

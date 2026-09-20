@@ -1,5 +1,5 @@
-import { AppShell } from '@/components/shell/AppShell';
+import { BusinessShell } from '@/components/business/BusinessShell';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <AppShell>{children}</AppShell>;
+  return <BusinessShell>{children}</BusinessShell>;
 }

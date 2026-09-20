@@ -9,7 +9,7 @@ import { getAccountId } from '@/server/auth';
 import { now } from '@/server/clock';
 import { listInventory, type InventoryView } from '@/server/services/inventory';
 
-export const metadata: Metadata = { title: 'Inventory' };
+export const metadata: Metadata = { title: 'My cards' };
 export const dynamic = 'force-dynamic';
 
 function Item({ item }: { item: InventoryView }) {
@@ -58,9 +58,9 @@ export default async function InventoryPage() {
   const accountId = await getAccountId();
   const { received, sent } = await listInventory(accountId, now());
   return (
-    <>
+    <div className="container-x section">
       <PageHeader
-        title="Inventory"
+        title="My cards"
         lede={`Every card you receive or send is kept for ${RULES.inventoryYears} years. Download any of them as an SVG; a warning shows ${RULES.inventoryWarnDays} days before one leaves.`}
       />
       <h2 className="section-title mt-0">Received</h2>
@@ -85,6 +85,6 @@ export default async function InventoryPage() {
       ) : (
         <Empty>Delivered cards appear here.</Empty>
       )}
-    </>
+    </div>
   );
 }

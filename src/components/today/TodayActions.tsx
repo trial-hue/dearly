@@ -33,7 +33,7 @@ export function TodayActions({ openCount }: { openCount: number }) {
         >
           {busy === 'draft' ? 'Drafting…' : 'Draft all with AI'}
         </button>
-        <Link href="/today?new=1" className="btn">
+        <Link href="/reminders?new=1" className="btn">
           New card
         </Link>
         <button

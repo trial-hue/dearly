@@ -45,7 +45,7 @@ export function CardEditor({ proposal: initial }: { proposal: ProposalDTO }) {
   const arrival = arrivalDate(card.mode, card.size, due, new Date());
   const modes = allowedModes(card.size);
 
-  const close = () => router.push('/today');
+  const close = () => router.push('/reminders');
 
   const patch = useCallback(
     async (changes: Partial<CardSpec>) => {
@@ -111,7 +111,7 @@ export function CardEditor({ proposal: initial }: { proposal: ProposalDTO }) {
         json: { action: 'skip' },
       });
       toast(`Skipped ${first}'s card this year`);
-      router.push('/today');
+      router.push('/reminders');
     });
 
   const ecardOnly = card.mode === 'ecard';

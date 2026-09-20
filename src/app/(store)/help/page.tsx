@@ -14,7 +14,7 @@ export default async function HelpPage() {
   const accountId = await getAccountId();
   const orders = await listOrders(accountId, now());
   return (
-    <>
+    <div className="container-x section">
       <PageHeader
         title="Help"
         lede="The AI agent answers and acts: reprints, eCards, upgrades and refunds within the rules. In production it also answers the phone, and always says it is an AI."
@@ -30,6 +30,6 @@ export default async function HelpPage() {
           })),
         )}
       />
-    </>
+    </div>
   );
 }

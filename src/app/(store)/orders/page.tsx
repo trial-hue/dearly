@@ -29,7 +29,7 @@ export default async function OrdersPage() {
   );
   const open = orders.filter((o) => !o.terminal).length;
   return (
-    <>
+    <div className="container-x section">
       <PageHeader
         title="Orders"
         lede="Every card moves through checked, routed, printed, inspected and posted with no one touching it. Delays trigger recovery automatically."
@@ -45,6 +45,6 @@ export default async function OrdersPage() {
           ))}
         </div>
       )}
-    </>
+    </div>
   );
 }

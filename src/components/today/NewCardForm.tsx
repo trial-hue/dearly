@@ -24,7 +24,7 @@ export function NewCardForm({ people }: { people: { id: string; name: string }[]
           const view = await api<{ key: string }>('/api/proposals', {
             json: { personId, type, date },
           });
-          router.push(`/today?edit=${encodeURIComponent(view.key)}`);
+          router.push(`/reminders?edit=${encodeURIComponent(view.key)}`);
         });
       }}
     >
@@ -70,7 +70,7 @@ export function NewCardForm({ people }: { people: { id: string; name: string }[]
         <button type="submit" className="btn btn-primary" disabled={busy !== null || !personId}>
           Create the card
         </button>
-        <button type="button" className="btn btn-ghost" onClick={() => router.push('/today')}>
+        <button type="button" className="btn btn-ghost" onClick={() => router.push('/reminders')}>
           Cancel
         </button>
       </div>

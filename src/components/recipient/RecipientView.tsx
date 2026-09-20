@@ -191,7 +191,7 @@ export function RecipientView({
       </div>
       <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs">
         <Badge>Recipient loop: reached from the QR code on the card back</Badge>
-        <Link href="/today" className="underline">
+        <Link href="/" className="underline">
           Back to the pilot
         </Link>
       </div>
