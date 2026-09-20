@@ -19,15 +19,14 @@ test.describe('accessibility smoke', () => {
     page,
   }) => {
     await page.goto('/today');
-    await expect(page.getByTestId('today-list')).toBeVisible();
+    await expect(page.getByTestId('ready-list')).toBeVisible();
     expect(serious((await new AxeBuilder({ page }).analyze()).violations)).toEqual([]);
 
-    await page.getByTestId('proposal-person_dan').getByRole('link', { name: 'Edit' }).click();
-    await expect(page.getByTestId('card-editor')).toBeVisible();
+    await page.getByTestId('reminder-person_dan').getByTestId('reminder-edit').click();
+    await expect(page.getByTestId('editor')).toBeVisible();
     expect(
       serious(
-        (await new AxeBuilder({ page }).include('[data-testid="card-editor"]').analyze())
-          .violations,
+        (await new AxeBuilder({ page }).include('[data-testid="editor"]').analyze()).violations,
       ),
     ).toEqual([]);
 

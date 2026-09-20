@@ -15,6 +15,7 @@ export function TodayActions({ openCount }: { openCount: number }) {
         <button
           type="button"
           className="btn btn-primary"
+          data-testid="draft-all"
           disabled={busy !== null || openCount === 0}
           onClick={() =>
             run('draft', async () => {
@@ -38,6 +39,7 @@ export function TodayActions({ openCount }: { openCount: number }) {
         <button
           type="button"
           className="btn btn-ghost"
+          data-testid="demo-reset"
           disabled={busy !== null}
           onClick={() => {
             if (

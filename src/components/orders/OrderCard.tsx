@@ -50,6 +50,7 @@ export function OrderCard({ order: o, qrSvg }: { order: OrderDTO; qrSvg: string 
                 key={s}
                 className={`step ${i < idx ? 'step-done' : i === idx ? 'step-now' : ''}`}
                 aria-current={i === idx ? 'step' : undefined}
+                data-testid={i === idx ? 'stage-current' : undefined}
               >
                 {STAGE_LABELS[s] ?? s}
               </li>

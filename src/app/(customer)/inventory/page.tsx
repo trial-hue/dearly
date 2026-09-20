@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 function Item({ item }: { item: InventoryView }) {
   const who = item.direction === 'received' ? `From ${item.fromName}` : `To ${item.toName}`;
   return (
-    <li className="card flex gap-3" data-testid={`inventory-${item.id}`}>
+    <li className="card flex gap-3" data-testid={`mycard-${item.id}`}>
       <div className="w-[64px] shrink-0">
         <CardFront
           card={item.card ?? { design: item.design as DesignId, customFront: null }}

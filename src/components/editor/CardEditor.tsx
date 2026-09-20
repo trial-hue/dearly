@@ -128,7 +128,7 @@ export function CardEditor({ proposal: initial }: { proposal: ProposalDTO }) {
       <div
         className="h-full w-full max-w-3xl overflow-y-auto bg-bg p-4 shadow-2xl md:p-6"
         onClick={(e) => e.stopPropagation()}
-        data-testid="card-editor"
+        data-testid="editor"
       >
         <div className="mb-4 flex items-start gap-3">
           <div className="flex-1">
@@ -190,6 +190,7 @@ export function CardEditor({ proposal: initial }: { proposal: ProposalDTO }) {
                     type="button"
                     className="btn btn-choice"
                     aria-pressed={card.size === s}
+                    data-testid={`size-${s}`}
                     onClick={() => void patch({ size: s })}
                     disabled={ecardOnly}
                   >
@@ -218,6 +219,7 @@ export function CardEditor({ proposal: initial }: { proposal: ProposalDTO }) {
                     type="button"
                     className="btn btn-choice"
                     aria-pressed={card.finish === f}
+                    data-testid={`finish-${f}`}
                     onClick={() => void patch({ finish: f })}
                     disabled={ecardOnly}
                   >
@@ -247,6 +249,7 @@ export function CardEditor({ proposal: initial }: { proposal: ProposalDTO }) {
               </div>
               <textarea
                 id="editor-message"
+                data-testid="message-input"
                 className="input min-h-[96px] font-hand text-lg"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -340,6 +343,7 @@ export function CardEditor({ proposal: initial }: { proposal: ProposalDTO }) {
                       type="button"
                       role="radio"
                       aria-checked={card.mode === m}
+                      data-testid={`mode-${m}`}
                       className="btn btn-choice"
                       onClick={() => void patch({ mode: m })}
                       disabled={isGiant && m !== 'tracked'}

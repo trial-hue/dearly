@@ -21,7 +21,7 @@ export function ProposalEnvelope({ proposal: p }: { proposal: ProposalDTO }) {
   return (
     <article
       className="envelope p-4 pt-5"
-      data-testid={`proposal-${p.person.id}`}
+      data-testid={`reminder-${p.person.id}`}
       aria-labelledby={`p-${p.id}-title`}
     >
       <div className="flex gap-4">
@@ -87,6 +87,7 @@ export function ProposalEnvelope({ proposal: p }: { proposal: ProposalDTO }) {
         <button
           type="button"
           className="btn btn-primary btn-sm"
+          data-testid="reminder-approve"
           disabled={busy !== null || !p.approvable}
           title={
             p.blockReason === 'address_stale'
@@ -105,12 +106,17 @@ export function ProposalEnvelope({ proposal: p }: { proposal: ProposalDTO }) {
         >
           {busy === 'approve' ? 'Paying…' : `Approve and pay ${formatPence(p.quote.totalPence)}`}
         </button>
-        <Link href={`/today?edit=${encodeURIComponent(p.key)}`} className="btn btn-sm">
+        <Link
+          href={`/today?edit=${encodeURIComponent(p.key)}`}
+          className="btn btn-sm"
+          data-testid="reminder-edit"
+        >
           Edit
         </Link>
         <button
           type="button"
           className="btn btn-ghost btn-sm"
+          data-testid="reminder-skip"
           disabled={busy !== null}
           onClick={() =>
             run('skip', async () => {

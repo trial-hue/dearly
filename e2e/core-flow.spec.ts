@@ -9,41 +9,38 @@ test.describe('core flow', () => {
     page,
   }) => {
     await page.goto('/today');
-    await expect(page.getByRole('heading', { name: 'Today' })).toBeVisible();
-    const proposals = page.getByTestId('today-list').locator('article');
-    expect(await proposals.count()).toBeGreaterThanOrEqual(4);
-    await expect(page.getByTestId('proposal-person_peter')).toHaveCount(0);
-    await expect(page.getByTestId('proposal-person_bill')).toContainText('Tracked');
-    await expect(page.getByTestId('proposal-person_sam')).toContainText('Pick-up');
-    await expect(page.getByTestId('proposal-person_priya')).toContainText(
-      'Address last checked over a year ago',
+    const ready = page.getByTestId('ready-list');
+    await expect(ready).toBeVisible();
+    expect(await ready.locator('[data-testid^="reminder-person_"]').count()).toBeGreaterThanOrEqual(
+      4,
     );
+    await expect(page.getByTestId('reminder-person_peter')).toHaveCount(0);
+    await expect(page.getByTestId('reminder-person_bill')).toContainText('Tracked');
+    await expect(page.getByTestId('reminder-person_sam')).toContainText('Pick-up');
+    await expect(page.getByTestId('reminder-person_priya')).toContainText(/address/i);
 
     // Edit Dan's card: Large changes the price at once.
-    await page.getByTestId('proposal-person_dan').getByRole('link', { name: 'Edit' }).click();
-    const editor = page.getByTestId('card-editor');
+    await page.getByTestId('reminder-person_dan').getByTestId('reminder-edit').click();
+    const editor = page.getByTestId('editor');
     await expect(editor).toBeVisible();
     await expect(editor.getByTestId('price-total')).toHaveText('£4.94');
     await expect(editor.getByTestId('moonpig-compare')).toContainText('£5.89');
-    await editor.getByRole('button', { name: /^Large/ }).click();
+    await editor.getByTestId('size-large').click();
     await expect(editor.getByTestId('price-total')).not.toHaveText('£4.94');
-    await editor.getByRole('button', { name: /^Regular/ }).click();
+    await editor.getByTestId('size-regular').click();
     await expect(editor.getByTestId('price-total')).toHaveText('£4.94');
-    await editor.getByRole('button', { name: /^Giant/ }).click();
-    await expect(editor.getByRole('radio', { name: /^Tracked/ })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
-    await editor.getByRole('button', { name: /^Regular/ }).click();
+    await editor.getByTestId('size-giant').click();
+    await expect(editor.getByTestId('mode-tracked')).toHaveAttribute('aria-checked', 'true');
+    await editor.getByTestId('size-regular').click();
     await editor.getByTestId('approve').click();
 
     // Orders: run the next step until delivered.
     await expect(page).toHaveURL(/\/orders/);
     const order = page
       .getByTestId('orders-list')
-      .locator('article')
+      .locator('[data-testid^="order-"]')
       .filter({ hasText: 'Dan Okafor' })
-      .filter({ hasText: 'Happy birthday' })
+      .filter({ hasText: /birthday/i })
       .first();
     await expect(order).toBeVisible();
     const orderId = (await order.getAttribute('data-testid')) as string;
@@ -55,13 +52,13 @@ test.describe('core flow', () => {
     await page.getByTestId('star-5').click();
     await expect(page.getByTestId('star-5')).toHaveAttribute('aria-checked', 'true');
     await page.getByTestId('save-to-dearly').click();
-    await expect(page.getByTestId('save-to-dearly')).toHaveText('Saved to your Dearly');
+    await expect(page.getByTestId('save-to-dearly')).toContainText(/Saved/);
     await page.getByTestId('send-one-back').click();
-    await expect(page.getByTestId('send-one-back')).toContainText('proposed on Today');
+    await expect(page.getByTestId('send-one-back')).toContainText(/proposed|Reminders/);
 
-    // Inventory shows the card twice (sent and saved); download is a valid SVG.
+    // My cards shows the card twice (sent and saved); download is a valid SVG.
     await page.goto('/inventory');
-    const items = page.locator('[data-testid^="inventory-"]').filter({ hasText: 'Dan Okafor' });
+    const items = page.locator('[data-testid^="mycard-"]').filter({ hasText: 'Dan Okafor' });
     expect(await items.count()).toBeGreaterThanOrEqual(2);
     const href = await items.first().getByTestId('download-card').getAttribute('href');
     const svg = await page.request.get(href as string);

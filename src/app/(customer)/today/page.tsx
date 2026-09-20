@@ -44,7 +44,7 @@ export default async function TodayPage({
           as they come into range.
         </Empty>
       ) : (
-        <div className="grid gap-4 lg:grid-cols-2" data-testid="today-list">
+        <div className="grid gap-4 lg:grid-cols-2" data-testid="ready-list">
           {screen.today.map((p) => (
             <ProposalEnvelope key={p.key} proposal={serialize(p)} />
           ))}

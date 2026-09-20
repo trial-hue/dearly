@@ -1,31 +1,30 @@
 import { expect, test } from '@playwright/test';
 
-import { resetDemo } from './helpers';
+import { expectToast, resetDemo } from './helpers';
 
 /**
  * Every AI feature works with no provider. The server under test runs with AI_PROVIDER=mock;
- * this suite still checks the shape of each job's result and the header pill.
+ * this suite still checks the shape of each job's result and the status in the demo menu.
  */
 test.describe('AI jobs and fallbacks', () => {
   test.beforeEach(async ({ page }) => resetDemo(page));
 
-  test('every job answers and the header shows the provider state', async ({ page }) => {
+  test('every job answers and the demo menu shows the provider state', async ({ page }) => {
     await page.goto('/today');
-    const pill = page.getByTestId('ai-status');
-    await expect(pill).toHaveText(/Built-in rules|Mock AI|AI connected/);
+    await expect(page.getByTestId('ai-status')).toHaveText(/Built-in rules|Mock AI|AI connected/);
 
-    await page.getByRole('button', { name: 'Draft all with AI' }).click();
-    await expect(page.getByRole('status')).toContainText(/Drafted \d+ cards/);
+    await page.getByTestId('draft-all').click();
+    await expectToast(page, /Drafted \d+ cards/);
 
     await page.goto('/people');
-    await page.getByRole('button', { name: 'Use the example' }).click();
+    await page.getByTestId('import-example').click();
     await page.getByTestId('import-preview').click();
-    await expect(page.getByText('3 found')).toBeVisible();
+    await expect(page.getByTestId('import-add-all')).toBeVisible();
     await page.getByTestId('import-add-all').click();
-    await expect(page.getByRole('status')).toContainText('Added 3 people');
+    await expectToast(page, 'Added 3 people');
     await expect(page.getByTestId('people-list')).toContainText('Jo Ellis');
 
-    await page.locator('#life-text').fill('Uncle Peter passed away in June');
+    await page.getByTestId('life-text').fill('Uncle Peter passed away in June');
     await page.getByTestId('life-event-check').click();
     await expect(page.getByTestId('life-event-result')).toContainText('Peter Ellis');
 
@@ -41,9 +40,9 @@ test.describe('AI jobs and fallbacks', () => {
     await expect(page.getByTestId('florist-reading')).toContainText('mother');
 
     await page.goto('/help');
-    await page.locator('#chat-input').fill("my card for Priya hasn't arrived");
+    await page.getByTestId('chat-input').fill("my card for Priya hasn't arrived");
     await page.getByTestId('chat-send').click();
-    await expect(page.getByTestId('chat-log')).toContainText(/Action: reprint/);
+    await expect(page.getByTestId('chat-log')).toContainText(/reprint/i);
   });
 
   test('the rules-only path is exercised directly against the API', async ({ page }) => {

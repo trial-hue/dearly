@@ -94,6 +94,7 @@ export function HelpChat({ orders }: { orders: OrderSummary[] }) {
         >
           <input
             id="chat-input"
+            data-testid="chat-input"
             className="input"
             placeholder="e.g. my card for Dan hasn't arrived"
             value={text}

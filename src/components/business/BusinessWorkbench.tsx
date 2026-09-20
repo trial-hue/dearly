@@ -161,6 +161,7 @@ export function BusinessWorkbench({ staffText }: { staffText: string }) {
               type="button"
               role="radio"
               aria-checked={option === o}
+              data-testid={`option-${o}`}
               className="btn btn-choice"
               onClick={() => setOption(o)}
             >

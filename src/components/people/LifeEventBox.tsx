@@ -28,6 +28,7 @@ export function LifeEventBox() {
       </p>
       <textarea
         id="life-text"
+        data-testid="life-text"
         className="input mt-2 min-h-[72px]"
         value={text}
         onChange={(e) => setText(e.target.value)}

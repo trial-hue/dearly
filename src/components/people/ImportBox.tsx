@@ -28,6 +28,7 @@ export function ImportBox() {
       </p>
       <textarea
         id="import-text"
+        data-testid="import-text"
         className="input mt-2 min-h-[96px] font-mono text-xs"
         placeholder={PLACEHOLDER}
         value={text}
@@ -50,7 +51,12 @@ export function ImportBox() {
         >
           {busy === 'preview' ? 'Reading…' : 'Preview'}
         </button>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => setText(PLACEHOLDER)}>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          data-testid="import-example"
+          onClick={() => setText(PLACEHOLDER)}
+        >
           Use the example
         </button>
       </div>

@@ -6,6 +6,10 @@ export async function resetDemo(page: Page): Promise<void> {
   expect(res.ok()).toBeTruthy();
 }
 
+export async function expectToast(page: Page, text: string | RegExp): Promise<void> {
+  await expect(page.getByTestId('toast')).toContainText(text);
+}
+
 export async function runNextStepUntil(
   page: Page,
   orderTestId: string,
@@ -13,13 +17,11 @@ export async function runNextStepUntil(
   maxSteps = 8,
 ): Promise<void> {
   for (let i = 0; i < maxSteps; i++) {
-    const current = page.getByTestId(orderTestId).locator('[aria-current="step"]');
+    const current = page.getByTestId(orderTestId).getByTestId('stage-current');
     if ((await current.textContent())?.trim() === stageText) return;
     await page.getByTestId('run-next-step').click();
-    await expect(page.getByRole('status')).toContainText('moved one step');
+    await expectToast(page, 'moved one step');
     await page.waitForTimeout(300);
   }
-  await expect(page.getByTestId(orderTestId).locator('[aria-current="step"]')).toHaveText(
-    stageText,
-  );
+  await expect(page.getByTestId(orderTestId).getByTestId('stage-current')).toHaveText(stageText);
 }

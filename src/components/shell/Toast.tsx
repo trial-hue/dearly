@@ -26,7 +26,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         className="pointer-events-none fixed inset-x-0 bottom-[calc(20px+env(safe-area-inset-bottom,0px))] flex justify-center px-4"
       >
         {message ? (
-          <div className="rounded-md bg-ink px-4 py-2 text-sm text-surface shadow-lg">
+          <div
+            className="rounded-md bg-ink px-4 py-2 text-sm text-surface shadow-lg"
+            data-testid="toast"
+          >
             {message}
           </div>
         ) : null}
