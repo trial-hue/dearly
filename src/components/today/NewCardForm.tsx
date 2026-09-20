@@ -24,7 +24,7 @@ export function NewCardForm({ people }: { people: { id: string; name: string }[]
           const view = await api<{ key: string }>('/api/proposals', {
             json: { personId, type, date },
           });
-          router.push(`/reminders?edit=${encodeURIComponent(view.key)}`);
+          router.push(`/personalise/${encodeURIComponent(view.key)}?from=reminder`);
         });
       }}
     >

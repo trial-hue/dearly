@@ -107,7 +107,7 @@ export function ProposalEnvelope({ proposal: p }: { proposal: ProposalDTO }) {
           {busy === 'approve' ? 'Paying…' : `Approve and pay ${formatPence(p.quote.totalPence)}`}
         </button>
         <Link
-          href={`/reminders?edit=${encodeURIComponent(p.key)}`}
+          href={`/personalise/${encodeURIComponent(p.key)}?from=reminder`}
           className="btn btn-sm"
           data-testid="reminder-edit"
         >

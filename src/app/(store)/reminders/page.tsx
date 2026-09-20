@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 
-import { CardEditor } from '@/components/editor/CardEditor';
 import { ImportBox } from '@/components/people/ImportBox';
 import { LifeEventBox } from '@/components/people/LifeEventBox';
 import { PersonRow } from '@/components/people/PersonRow';
@@ -15,7 +14,7 @@ import { serialize } from '@/lib/serialize';
 import { getAccountId } from '@/server/auth';
 import { now } from '@/server/clock';
 import { listPeople } from '@/server/services/people';
-import { getProposal, listProposals } from '@/server/services/proposals';
+import { listProposals } from '@/server/services/proposals';
 
 export const metadata: Metadata = { title: 'Today' };
 export const dynamic = 'force-dynamic';
@@ -25,7 +24,7 @@ export default async function TodayPage({
 }: {
   searchParams: Promise<{ edit?: string; new?: string; tab?: string }>;
 }) {
-  const { edit, new: newCard, tab } = await searchParams;
+  const { new: newCard, tab } = await searchParams;
   const accountId = await getAccountId();
   const today = now();
   if (tab === 'people') {
@@ -50,7 +49,6 @@ export default async function TodayPage({
     );
   }
   const screen = await listProposals(accountId, today);
-  const editing = edit ? await getProposal(edit, today) : null;
 
   return (
     <div className="container-x section">
@@ -161,8 +159,6 @@ export default async function TodayPage({
           {plural(screen.skippedCount, 'card')} skipped this year.
         </p>
       ) : null}
-
-      {editing ? <CardEditor key={editing.key} proposal={serialize(editing)} /> : null}
     </div>
   );
 }

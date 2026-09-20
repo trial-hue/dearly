@@ -23,16 +23,19 @@ test.describe('core flow', () => {
     await page.getByTestId('reminder-person_dan').getByTestId('reminder-edit').click();
     const editor = page.getByTestId('editor');
     await expect(editor).toBeVisible();
-    await expect(editor.getByTestId('price-total')).toHaveText('£4.94');
-    await expect(editor.getByTestId('moonpig-compare')).toContainText('£5.89');
+    await expect(page.getByTestId('price-total')).toHaveText('£4.94');
+    await expect(page.getByTestId('moonpig-compare')).toContainText('£5.89');
     await editor.getByTestId('size-large').click();
-    await expect(editor.getByTestId('price-total')).not.toHaveText('£4.94');
+    await expect(page.getByTestId('price-total')).not.toHaveText('£4.94');
     await editor.getByTestId('size-regular').click();
-    await expect(editor.getByTestId('price-total')).toHaveText('£4.94');
+    await expect(page.getByTestId('price-total')).toHaveText('£4.94');
     await editor.getByTestId('size-giant').click();
+    await page.getByTestId('step-5').click();
     await expect(editor.getByTestId('mode-tracked')).toHaveAttribute('aria-checked', 'true');
+    await page.getByTestId('step-1').click();
     await editor.getByTestId('size-regular').click();
-    await editor.getByTestId('approve').click();
+    await expect(page.getByTestId('price-total')).toHaveText('£4.94');
+    await page.getByTestId('approve').click();
 
     // Orders: run the next step until delivered.
     await expect(page).toHaveURL(/\/orders/);
