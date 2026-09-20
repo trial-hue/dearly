@@ -21,35 +21,34 @@ export function ProductGallery({ designId }: { designId: string }) {
   ];
   return (
     <div className="grid gap-3 md:grid-cols-[72px_1fr]">
-      <ul className="order-2 flex gap-2 md:order-1 md:flex-col" role="tablist" aria-label="Views">
+      <div className="order-2 flex gap-2 md:order-1 md:flex-col" role="tablist" aria-label="Views">
         {views.map((v) => (
-          <li key={v.id}>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={view === v.id}
-              aria-label={v.label}
-              className={`w-[72px] rounded-[10px] p-1 ring-offset-2 ring-offset-bg ${view === v.id ? 'ring-2 ring-ink' : 'hover:ring-2 hover:ring-line'}`}
-              onClick={() => setView(v.id)}
-            >
-              {v.id === 'front' ? (
-                <CardMock design={design} title={title} name="" bare hover={false} />
-              ) : v.id === 'inside' ? (
-                <div className="paper aspect-[5/7] w-full p-1.5">
-                  <div className="h-full w-full border-l border-dashed border-line" />
-                </div>
-              ) : (
-                <div className="aspect-[5/7] w-full rounded-[4px] bg-surface-2 p-1.5">
-                  <div
-                    className="h-full w-full rounded-sm bg-paper"
-                    style={{ clipPath: 'polygon(0 30%, 50% 60%, 100% 30%, 100% 100%, 0 100%)' }}
-                  />
-                </div>
-              )}
-            </button>
-          </li>
+          <button
+            key={v.id}
+            type="button"
+            role="tab"
+            aria-selected={view === v.id}
+            aria-label={v.label}
+            className={`w-[72px] rounded-[10px] p-1 ring-offset-2 ring-offset-bg ${view === v.id ? 'ring-2 ring-ink' : 'hover:ring-2 hover:ring-line'}`}
+            onClick={() => setView(v.id)}
+          >
+            {v.id === 'front' ? (
+              <CardMock design={design} title={title} name="" bare hover={false} />
+            ) : v.id === 'inside' ? (
+              <div className="paper aspect-[5/7] w-full p-1.5">
+                <div className="h-full w-full border-l border-dashed border-line" />
+              </div>
+            ) : (
+              <div className="aspect-[5/7] w-full rounded-[4px] bg-surface-2 p-1.5">
+                <div
+                  className="h-full w-full rounded-sm bg-paper"
+                  style={{ clipPath: 'polygon(0 30%, 50% 60%, 100% 30%, 100% 100%, 0 100%)' }}
+                />
+              </div>
+            )}
+          </button>
         ))}
-      </ul>
+      </div>
       <div className="order-1 md:order-2" data-testid={`gallery-${view}`}>
         {view === 'front' ? (
           <CardMock

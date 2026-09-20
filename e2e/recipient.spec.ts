@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { resetDemo } from './helpers';
+import { openDemoControls, resetDemo } from './helpers';
 
 test.describe('recovery', () => {
   test.beforeEach(async ({ page }) => resetDemo(page));
@@ -11,14 +11,15 @@ test.describe('recovery', () => {
     await page.goto('/orders');
     const order = page.getByTestId('order-ord_seed_priya');
     await expect(order).toContainText('Posted');
-    await order.getByTestId('delay').click();
+    await openDemoControls(page);
+    await page.locator('[data-testid="delay"][data-order="ord_seed_priya"]').click();
     const recovery = order.getByTestId('recovery');
     await expect(recovery).toBeVisible();
     await expect(recovery).toContainText('On-the-day eCard');
     await expect(recovery).toContainText('Full refund');
     await expect(recovery).toContainText('50% off the next card');
     await expect(recovery).toContainText('Tracked reprint');
-    await page.goto('/operations');
+    await page.goto('/hq/operations');
     const decisions = page.getByTestId('decisions');
     await expect(decisions).toContainText('Refunded');
     await expect(decisions).toContainText('Tracked reprint');

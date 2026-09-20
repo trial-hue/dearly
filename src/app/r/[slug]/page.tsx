@@ -14,7 +14,7 @@ export default async function RecipientPage({ params }: { params: Promise<{ slug
   const found = await getOrderBySlug(slug, now());
   if (!found) notFound();
   return (
-    <main className="mx-auto min-h-full max-w-xl px-4 py-8">
+    <main className="min-h-full bg-surface-2 px-4 py-8 md:py-14">
       <RecipientView
         order={serialize(found.view)}
         senderName={found.senderName}

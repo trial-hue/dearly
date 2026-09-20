@@ -1,135 +1,118 @@
 'use client';
 
+import { SendHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
-import { Badge, ErrorNote } from '@/components/ui';
-import { STAGE_LABELS } from '@/domain';
+import { ErrorNote } from '@/components/ui';
 import { api, useAction } from '@/lib/fetcher';
-import { fmtDate } from '@/lib/format';
+
+import { ChatBubble } from './ChatBubble';
 
 interface Turn {
   role: 'user' | 'assistant';
   content: string;
-  action?: string;
   applied?: string | null;
-  by?: 'ai' | 'rule';
 }
 
-interface OrderSummary {
-  id: string;
-  recipientName: string;
-  stage: string;
-  promisedDate: string;
-  late: boolean;
-}
+const QUICK = [
+  'Where is my card?',
+  "My card hasn't arrived",
+  'It arrived damaged',
+  'Can it come sooner?',
+];
 
-export function HelpChat({ orders }: { orders: OrderSummary[] }) {
+/** A centred chat with quick replies. What the agent did shows as a small chip. */
+export function HelpChat({ recentNames }: { recentNames: string[] }) {
   const { run, busy, error } = useAction();
   const [turns, setTurns] = useState<Turn[]>([
     {
       role: 'assistant',
-      content:
-        'Hello, I am Dearly’s help agent, an AI. Ask about any card: where it is, if it is late or damaged, or if you need it faster.',
+      content: `Hi, I'm Dearly's help assistant. Ask about any card: where it is, if it's late or damaged, or if you need it faster.${recentNames.length ? ` Your recent cards were for ${recentNames.join(', ')}.` : ''}`,
     },
   ]);
   const [text, setText] = useState('');
 
-  const send = () => {
-    const message = text.trim();
-    if (!message) return;
-    const history = turns
-      .filter((t) => t.role === 'user' || t.role === 'assistant')
-      .map((t) => ({ role: t.role, content: t.content }));
-    setTurns((t) => [...t, { role: 'user', content: message }]);
+  const send = (message: string) => {
+    const m = message.trim();
+    if (!m) return;
+    const history = turns.map((t) => ({ role: t.role, content: t.content }));
+    setTurns((t) => [...t, { role: 'user', content: m }]);
     setText('');
     void run('send', async () => {
-      const r = await api<{
-        reply: string;
-        action: string;
-        orderId: string | null;
-        by: 'ai' | 'rule';
-        applied: string | null;
-      }>('/api/agent', { json: { message, turns: history.slice(-6) } });
+      const r = await api<{ reply: string; action: string; applied: string | null }>('/api/agent', {
+        json: { message: m, turns: history.slice(-6) },
+      });
       setTurns((t) => [
         ...t,
-        { role: 'assistant', content: r.reply, action: r.action, applied: r.applied, by: r.by },
+        {
+          role: 'assistant',
+          content: r.reply,
+          applied: r.action !== 'none' ? (r.applied ?? r.action.replace('_', ' ')) : null,
+        },
       ]);
     });
   };
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
-      <section className="card flex min-h-[420px] flex-col" aria-label="Chat">
-        <ol className="flex flex-1 flex-col gap-2 overflow-y-auto" data-testid="chat-log">
-          {turns.map((t, i) => (
-            <li
-              key={i}
-              className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${t.role === 'user' ? 'self-end bg-ink text-surface' : 'self-start bg-surface2'}`}
-            >
-              <p>{t.content}</p>
-              {t.role === 'assistant' && t.action && t.action !== 'none' ? (
-                <div className="mt-1 flex flex-wrap gap-1">
-                  <Badge kind="ai">Action: {t.action.replace('_', ' ')}</Badge>
-                  {t.applied ? <Badge>{t.applied}</Badge> : null}
-                </div>
-              ) : null}
-              {t.role === 'assistant' && t.by ? (
-                <div className="mt-1">
-                  {t.by === 'ai' ? (
-                    <Badge kind="ai">Answered by AI</Badge>
-                  ) : (
-                    <Badge>Built-in rules</Badge>
-                  )}
-                </div>
-              ) : null}
-            </li>
-          ))}
-        </ol>
-        <form
-          className="mt-3 flex gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            send();
-          }}
-        >
-          <input
-            id="chat-input"
-            data-testid="chat-input"
-            className="input"
-            placeholder="e.g. my card for Dan hasn't arrived"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            aria-label="Your message"
-          />
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={busy !== null || !text.trim()}
-            data-testid="chat-send"
+    <div className="mx-auto max-w-2xl">
+      <ol className="flex min-h-[380px] flex-col gap-2" data-testid="chat-log">
+        {turns.map((t, i) => (
+          <ChatBubble
+            key={i}
+            role={t.role}
+            footer={
+              t.applied ? <span className="label label-success">Done: {t.applied}</span> : undefined
+            }
           >
-            {busy ? 'Sending…' : 'Send'}
+            {t.content}
+          </ChatBubble>
+        ))}
+      </ol>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {QUICK.map((q) => (
+          <button
+            key={q}
+            type="button"
+            className="chip"
+            disabled={busy !== null}
+            onClick={() => send(q)}
+          >
+            {q}
           </button>
-        </form>
-        <ErrorNote message={error} />
-      </section>
-      <aside className="card text-sm">
-        <h2 className="font-bold">Your recent orders</h2>
-        <ul className="mt-2 space-y-1">
-          {orders.map((o) => (
-            <li key={o.id} className="flex flex-wrap gap-x-2">
-              <span className="font-medium">{o.recipientName}</span>
-              <span className="muted">
-                {STAGE_LABELS[o.stage] ?? o.stage}, promised {fmtDate(o.promisedDate)}
-                {o.late ? ', late' : ''}
-              </span>
-            </li>
-          ))}
-        </ul>
-        <p className="muted mt-3 text-xs">
-          Every action the agent takes is written to the decision log on Operations. Refunds need a
-          late or damaged order.
-        </p>
-      </aside>
+        ))}
+      </div>
+      <form
+        className="mt-3 flex gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          send(text);
+        }}
+      >
+        <input
+          id="chat-input"
+          data-testid="chat-input"
+          className="input input-pill"
+          placeholder="Type a message"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          aria-label="Your message"
+        />
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={busy !== null || !text.trim()}
+          data-testid="chat-send"
+          aria-label="Send"
+        >
+          <SendHorizontal size={18} strokeWidth={1.75} aria-hidden="true" />
+          <span className="hidden sm:inline">Send</span>
+        </button>
+      </form>
+      <ErrorNote message={error} />
+      <p className="mt-3 text-center text-xs text-ink-2">
+        You are talking to an assistant. A person steps in whenever it matters, and can be reached
+        by phone.
+      </p>
     </div>
   );
 }

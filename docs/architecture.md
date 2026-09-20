@@ -20,6 +20,14 @@ worker (src/server/jobs): polls the Job table for time-based work
 - `src/server/ai` is the gateway: `runJob(job, input)` builds the prompt, asks the provider, parses with the job's schema, validates allowed values, and on any failure returns the job's rules-based fallback. Every run writes a `Decision` row (actor `ai` or `rule`) with an estimated cost.
 - `src/server/jobs` is the worker loop and its handlers (`send_ecard`, `send_batch_card`). "Run the next step" on Orders also runs due jobs so the demo needs no worker.
 
+## Presentation: three layouts
+
+- **Storefront (`src/app/(store)`, `src/components/store`)**: promo strip, header with search and the Reminders, Account and Basket buttons, a category row with mega-menus (a scrolling pill row on phones), the footer with the airmail edge and the Demo menu, a bottom tab bar under 768px and a floating help button. Home, browse, product, reminders, basket, orders, my cards, help and account live here.
+- **Personalise (`src/app/(editor)`, `src/components/editor`)**: a full-screen editor shell over one proposal: five steps, the card centred, tools in a side panel or a bottom sheet, a sticky bar with the running total. The old drawer editor and the eCard studio are folded in.
+- **Business (`src/app/(business)`)** and **HQ (`src/app/(hq)`)** have their own shells. HQ keeps the tables, charts and internal labels; nothing on the storefront names the pilot, the AI provider or a simulator.
+
+The catalogue (`src/catalogue`) describes each card front as a shape list built from illustrative primitives (`primitives.ts`), rendered as React (`SceneSvg`) in the interface and as an SVG string for storage and downloads. `CardMock` is the single card renderer. Prices on tiles and option tiles come from `quote()` through `src/lib/pricing.ts`.
+
 ## Request flow: approving a card
 
 1. `PATCH /api/proposals/[key]` with `{action: "approve"}`.

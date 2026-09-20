@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
 import QRCode from 'qrcode';
 
+import { DemoControls } from '@/components/orders/DemoControls';
 import { OrderCard } from '@/components/orders/OrderCard';
-import { OrdersActions } from '@/components/orders/OrdersActions';
-import { PageHeader } from '@/components/shell/PageHeader';
-import { Empty } from '@/components/ui';
+import { EmptyState } from '@/components/store/EmptyState';
 import { env } from '@/env';
 import { serialize } from '@/lib/serialize';
 import { getAccountId } from '@/server/auth';
@@ -22,22 +21,42 @@ export default async function OrdersPage() {
       QRCode.toString(`${env.APP_URL}${o.recipientPath}`, {
         type: 'svg',
         margin: 1,
-        width: 88,
-        color: { dark: '#141D36', light: '#FFFFFF' },
+        width: 80,
+        color: { dark: '#14213D', light: '#FFFFFF' },
       }),
     ),
   );
-  const open = orders.filter((o) => !o.terminal).length;
+  const open = orders.filter((o) => !o.terminal);
+  const delayable = orders
+    .filter(
+      (o) =>
+        !o.terminal &&
+        !o.delayed &&
+        o.mode !== 'ecard' &&
+        o.mode !== 'pickup' &&
+        (o.stage === 'posted' || o.stage === 'inspected'),
+    )
+    .map((o) => ({ id: o.id, name: o.recipientName }));
   return (
     <div className="container-x section">
-      <PageHeader
-        title="Orders"
-        lede="Every card moves through checked, routed, printed, inspected and posted with no one touching it. Delays trigger recovery automatically."
-      >
-        <OrdersActions openCount={open} />
-      </PageHeader>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="t-h1">Orders</h1>
+          <p className="text-sm text-ink-2">
+            Every card, where it is, and what we do if one runs late.
+          </p>
+        </div>
+      </div>
+      <div className="mb-6">
+        <DemoControls openCount={open.length} delayable={delayable} />
+      </div>
       {orders.length === 0 ? (
-        <Empty>No orders yet. Approve a proposal on Today.</Empty>
+        <EmptyState
+          title="No orders yet"
+          text="Approve a card we have ready, or pick one to personalise."
+          cta="Ready for you"
+          ctaHref="/reminders"
+        />
       ) : (
         <div className="space-y-4" data-testid="orders-list">
           {orders.map((o, i) => (

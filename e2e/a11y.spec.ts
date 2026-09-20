@@ -15,10 +15,14 @@ function serious(violations: Violation[]): string[] {
 test.describe('accessibility smoke', () => {
   test.beforeEach(async ({ page }) => resetDemo(page));
 
-  test('Today, the editor and the recipient page have no serious or critical issues', async ({
+  test('Home, Browse, Product, Personalise, Reminders and the recipient page have no serious or critical issues', async ({
     page,
   }) => {
-    await page.goto('/today');
+    for (const url of ['/', '/cards/birthday', '/card/bday-balloon-bunch']) {
+      await page.goto(url);
+      expect(serious((await new AxeBuilder({ page }).analyze()).violations), url).toEqual([]);
+    }
+    await page.goto('/reminders');
     await expect(page.getByTestId('ready-list')).toBeVisible();
     expect(serious((await new AxeBuilder({ page }).analyze()).violations)).toEqual([]);
 

@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { CardFront } from '@/components/card/CardFront';
+import { CardMock } from '@/components/card/CardMock';
 import { useToast } from '@/components/shell/Toast';
+import { GuaranteeBadge } from '@/components/store/GuaranteeBadge';
 import { ErrorNote } from '@/components/ui';
 import { FINISHES, MODES, SIZES } from '@/domain';
 import { api, useAction } from '@/lib/fetcher';
@@ -23,11 +24,11 @@ export function BasketView() {
   const { toast } = useToast();
   const { run, busy, error } = useAction();
   const [items, setItems] = useState<ProposalDTO[] | null>(null);
-  const keyList = basket.keys.join('|');
+  const keyList = JSON.stringify(basket.keys);
 
   useEffect(() => {
     let cancelled = false;
-    const keys = keyList ? keyList.split('|') : [];
+    const keys = JSON.parse(keyList) as string[];
     Promise.all(
       keys.map((k) =>
         api<ProposalDTO>(`/api/proposals/${encodeURIComponent(k)}`).catch(() => null),
@@ -90,7 +91,14 @@ export function BasketView() {
             return (
               <li key={p.key} className="panel flex gap-4" data-testid={`basket-item-${p.key}`}>
                 <div className="w-[120px] shrink-0">
-                  <CardFront card={p.card} title={p.title} name={first} age={p.age} />
+                  <CardMock
+                    card={p.card}
+                    title={p.title}
+                    name={first}
+                    age={p.age}
+                    bare
+                    hover={false}
+                  />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h2 className="t-h3">
@@ -174,9 +182,8 @@ export function BasketView() {
             </dd>
           </div>
         </dl>
-        <p className="mt-3 flex items-center gap-2 text-sm text-ink-2">
-          <span className="airmail-stripe inline-block h-2.5 w-6 rounded-sm" aria-hidden="true" />
-          Delivery guarantee: arrives on time or your money back.
+        <p className="mt-3">
+          <GuaranteeBadge />
         </p>
         <button
           type="button"

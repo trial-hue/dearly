@@ -29,7 +29,8 @@
     "db:migrate:dev": "tsx scripts/with-db.ts -- prisma migrate dev",
     "db:seed": "tsx scripts/with-db.ts -- tsx prisma/seed.ts",
     "db:reset": "tsx scripts/with-db.ts -- tsx prisma/seed.ts --reset",
-    "db:studio": "tsx scripts/with-db.ts -- prisma studio"
+    "db:studio": "tsx scripts/with-db.ts -- prisma studio",
+    "screenshots": "tsx scripts/screenshots.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -45,6 +45,18 @@ docker compose up --build
 
 `docker compose up` starts PostgreSQL, the web app on http://localhost:3000 and the worker. Migrations run on start; seed the demo with `docker compose --profile seed run --rm seed`. The image runs as a non-root user and answers `/api/health`.
 
+## Three layouts and the route map
+
+| Layout                                                                   | Routes                                                                                                                                                                                        |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A. Storefront (top header, category row, footer, phone tab bar)          | `/`, `/cards`, `/cards/[occasion]`, `/card/[designId]`, `/personalise/[key]`, `/reminders`, `/basket`, `/orders`, `/my-cards`, `/help`, `/account`, and the public recipient page `/r/[slug]` |
+| B. Dearly for Business (own header, denser)                              | `/business`, `/business/send`, `/business/pricing`                                                                                                                                            |
+| C. Dearly HQ (dashboard style, reached only from the footer's Demo menu) | `/hq/operations`, `/hq/partners`, `/hq/kit`                                                                                                                                                   |
+
+The old routes redirect: `/today` and `/people` to `/reminders`, `/studio` to `/cards`, `/inventory` to `/my-cards`, `/florists` to `/hq/partners`, `/operations` to `/hq/operations`. `docs/design/restructure.md` maps every feature to its home.
+
+Cards are the product: a catalogue of 49 layered SVG designs in `src/catalogue` renders through one `CardMock` component everywhere, and a chosen design is stored on a proposal as its custom front so the domain and schema stay untouched (ADR 0004).
+
 ## Architecture in one paragraph
 
 Next.js App Router with TypeScript in strict mode. `src/domain` is pure TypeScript with no I/O: pricing in integer pence, the delivery rule, the calendar, routing, proposals, recovery, forecast and unit economics, each unit-tested. `src/server/services` are the only callers of Prisma. Route handlers under `src/app/api` validate input with `zod`, call one service and return problem JSON on failure. Server components read services directly; client components mutate through the API and refresh. Simulated partners (payments, printers, carriers, messaging, storage) sit behind adapter interfaces in `src/server/adapters`. The AI gateway in `src/server/ai` has a provider interface, a Claude provider on Anthropic's official SDK, a mock provider for tests, and one file per job with its prompt, `zod` schema, validator and rules-based fallback. Every AI or rules decision is written to the `Decision` table that Operations shows. See `docs/architecture.md`.
@@ -80,6 +92,7 @@ Payments, printing, postage and carrier tracking, HR sync, florist systems, emai
 - `zod` 4: every API input and every AI output is parsed before use.
 - `@anthropic-ai/sdk`: the official client; model identifiers come from the environment.
 - `esbuild`: bundles the worker for the container image.
+- `lucide-react`: the icon set for navigation and controls (20px, 1.75 stroke, always with a text label in navigation). Dialogs, sheets and carousels use native `<dialog>` and CSS scroll-snap, so no primitive library was needed.
 
 ## Documentation
 

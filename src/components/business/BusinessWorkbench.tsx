@@ -94,7 +94,7 @@ export function BusinessWorkbench({ staffText }: { staffText: string }) {
             data-testid="clean-ai"
             onClick={() => void clean('ai')}
           >
-            {busy === 'ai' ? 'Checking…' : 'Check with AI'}
+            {busy === 'ai' ? 'Checking…' : 'Check it for me'}
           </button>
         </div>
         {rows && summary ? (
@@ -103,7 +103,7 @@ export function BusinessWorkbench({ staffText }: { staffText: string }) {
               <span className="font-medium">
                 {summary.scheduled} ready, {summary.flagged} flagged
               </span>
-              {by === 'ai' ? <Badge kind="ai">Checked by AI</Badge> : <Badge>Strict parser</Badge>}
+              {by === 'ai' ? <Badge kind="ai">Checked for you</Badge> : null}
             </div>
             <div className="tbl-wrap">
               <table className="table">

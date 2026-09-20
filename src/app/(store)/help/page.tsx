@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 
 import { HelpChat } from '@/components/help/HelpChat';
-import { PageHeader } from '@/components/shell/PageHeader';
-import { serialize } from '@/lib/serialize';
 import { getAccountId } from '@/server/auth';
 import { now } from '@/server/clock';
 import { listOrders } from '@/server/services/orders';
@@ -15,20 +13,16 @@ export default async function HelpPage() {
   const orders = await listOrders(accountId, now());
   return (
     <div className="container-x section">
-      <PageHeader
-        title="Help"
-        lede="The AI agent answers and acts: reprints, eCards, upgrades and refunds within the rules. In production it also answers the phone, and always says it is an AI."
-      />
+      <div className="mx-auto mb-6 max-w-2xl text-center">
+        <h1 className="t-h1">How can we help?</h1>
+        <p className="mt-1 text-ink-2">
+          Ask about any card. We can reprint, resend, upgrade or refund straight away.
+        </p>
+      </div>
       <HelpChat
-        orders={serialize(
-          orders.slice(0, 6).map((o) => ({
-            id: o.id,
-            recipientName: o.recipientName,
-            stage: o.stage,
-            promisedDate: o.promisedDate,
-            late: o.late,
-          })),
-        )}
+        recentNames={[
+          ...new Set(orders.slice(0, 4).map((o) => o.recipientName.split(' ')[0] ?? '')),
+        ]}
       />
     </div>
   );

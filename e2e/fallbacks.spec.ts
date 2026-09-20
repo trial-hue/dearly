@@ -10,13 +10,14 @@ test.describe('AI jobs and fallbacks', () => {
   test.beforeEach(async ({ page }) => resetDemo(page));
 
   test('every job answers and the demo menu shows the provider state', async ({ page }) => {
-    await page.goto('/today');
+    await page.goto('/reminders');
     await expect(page.getByTestId('ai-status')).toHaveText(/Built-in rules|Mock AI|AI connected/);
 
     await page.getByTestId('draft-all').click();
     await expectToast(page, /Drafted \d+ cards/);
 
-    await page.goto('/people');
+    await page.goto('/reminders?tab=people');
+    await page.getByTestId('import-open').click();
     await page.getByTestId('import-example').click();
     await page.getByTestId('import-preview').click();
     await expect(page.getByTestId('import-add-all')).toBeVisible();
@@ -24,17 +25,18 @@ test.describe('AI jobs and fallbacks', () => {
     await expectToast(page, 'Added 3 people');
     await expect(page.getByTestId('people-list')).toContainText('Jo Ellis');
 
+    await page.getByTestId('life-open').click();
     await page.getByTestId('life-text').fill('Uncle Peter passed away in June');
     await page.getByTestId('life-event-check').click();
     await expect(page.getByTestId('life-event-result')).toContainText('Peter Ellis');
 
-    await page.goto('/business');
+    await page.goto('/business/send');
     await page.getByTestId('clean-rules').click();
     await expect(page.getByTestId('staff-rows')).toContainText('7 ready, 3 flagged');
     await page.getByTestId('clean-ai').click();
     await expect(page.getByTestId('staff-rows')).toBeVisible();
 
-    await page.goto('/florists');
+    await page.goto('/hq/partners');
     await page.getByTestId('read-order').click();
     await expect(page.getByTestId('florist-reading')).toContainText('Mrs J Sharma');
     await expect(page.getByTestId('florist-reading')).toContainText('mother');

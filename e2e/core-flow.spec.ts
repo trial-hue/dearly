@@ -8,16 +8,21 @@ test.describe('core flow', () => {
   test('proposal to delivered card, recipient rating, inventory and printer score', async ({
     page,
   }) => {
-    await page.goto('/today');
+    await page.goto('/reminders');
     const ready = page.getByTestId('ready-list');
     await expect(ready).toBeVisible();
     expect(await ready.locator('[data-testid^="reminder-person_"]').count()).toBeGreaterThanOrEqual(
       4,
     );
     await expect(page.getByTestId('reminder-person_peter')).toHaveCount(0);
-    await expect(page.getByTestId('reminder-person_bill')).toContainText('Tracked');
-    await expect(page.getByTestId('reminder-person_sam')).toContainText('Pick-up');
+    await expect(page.getByTestId('reminder-person_bill')).toContainText('Arrives by');
     await expect(page.getByTestId('reminder-person_priya')).toContainText(/address/i);
+    // The delivery rule: Bill (3 days) is tracked, Sam (tomorrow) is a pick-up.
+    const screen = (await (await page.request.get('/api/proposals')).json()) as {
+      today: { personId: string; card: { mode: string } }[];
+    };
+    expect(screen.today.find((p) => p.personId === 'person_bill')?.card.mode).toBe('tracked');
+    expect(screen.today.find((p) => p.personId === 'person_sam')?.card.mode).toBe('pickup');
 
     // Edit Dan's card: Large changes the price at once.
     await page.getByTestId('reminder-person_dan').getByTestId('reminder-edit').click();
@@ -42,7 +47,7 @@ test.describe('core flow', () => {
     const order = page
       .getByTestId('orders-list')
       .locator('[data-testid^="order-"]')
-      .filter({ hasText: 'Dan Okafor' })
+      .filter({ hasText: /Dan/ })
       .filter({ hasText: /birthday/i })
       .first();
     await expect(order).toBeVisible();
@@ -60,8 +65,9 @@ test.describe('core flow', () => {
     await expect(page.getByTestId('send-one-back')).toContainText(/proposed|Reminders/);
 
     // My cards shows the card twice (sent and saved); download is a valid SVG.
-    await page.goto('/inventory');
-    const items = page.locator('[data-testid^="mycard-"]').filter({ hasText: 'Dan Okafor' });
+    await page.goto('/my-cards?tab=sent');
+    await page.goto('/my-cards');
+    const items = page.locator('[data-testid^="mycard-"]').filter({ hasText: /Dan/ });
     expect(await items.count()).toBeGreaterThanOrEqual(2);
     const href = await items.first().getByTestId('download-card').getAttribute('href');
     const svg = await page.request.get(href as string);
@@ -70,7 +76,7 @@ test.describe('core flow', () => {
     expect(await svg.text()).toContain('<svg');
 
     // Operations: the printer score moved and a recipient joined.
-    await page.goto('/operations');
+    await page.goto('/hq/operations');
     await expect(page.getByTestId('printer-mcr').getByTestId('printer-score')).toContainText(
       '4.82',
     );

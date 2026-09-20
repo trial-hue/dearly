@@ -8,7 +8,7 @@ import { fmtDate, formatPence } from '@/lib/format';
 import { now } from '@/server/clock';
 import { listReferrals } from '@/server/services/partners';
 
-export const metadata: Metadata = { title: 'Florist partners' };
+export const metadata: Metadata = { title: 'Partners' };
 export const dynamic = 'force-dynamic';
 
 export default async function FloristsPage() {
