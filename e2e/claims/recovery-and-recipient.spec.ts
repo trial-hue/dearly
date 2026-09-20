@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { openDemoControls, resetDemo } from './helpers';
+import { openDemoControls, resetDemo } from '../helpers';
 
 test.describe('recovery', () => {
   test.beforeEach(async ({ page }) => resetDemo(page));

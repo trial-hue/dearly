@@ -11,7 +11,7 @@ export default function BusinessPricingPage() {
     <div>
       <h1 className="t-h1">Pricing</h1>
       <p className="mb-6 mt-1 text-ink-2">Prices are per card, ex VAT, delivery included.</p>
-      <div className="mb-8 grid gap-3 sm:grid-cols-3">
+      <div className="mb-8 grid gap-3 sm:grid-cols-3" data-testid="business-prices">
         {[
           [
             'Posted to a home',

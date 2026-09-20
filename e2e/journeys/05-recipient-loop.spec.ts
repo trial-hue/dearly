@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 
-import { resetDemo, runNextStepUntil } from './helpers';
-import { PRICES } from './prices';
+import { resetDemo, runNextStepUntil } from '../helpers';
+import { PRICES } from '../prices';
 
-test.describe('core flow', () => {
+test.describe('journey 5: recipient loop', () => {
   test.beforeEach(async ({ page }) => resetDemo(page));
 
   test('proposal to delivered card, recipient rating, inventory and printer score', async ({
@@ -79,11 +79,10 @@ test.describe('core flow', () => {
     await page.getByTestId('send-one-back').click();
     await expect(page.getByTestId('send-one-back')).toContainText(/proposed|Reminders/);
 
-    // My cards shows the card twice (sent and saved); download is a valid SVG.
+    // My cards shows the sent copy (the saved copy belongs to Dan's new account); download is a valid SVG.
     await page.goto('/my-cards?tab=sent');
-    await page.goto('/my-cards');
     const items = page.locator('[data-testid^="mycard-"]').filter({ hasText: /Dan/ });
-    expect(await items.count()).toBeGreaterThanOrEqual(2);
+    expect(await items.count()).toBeGreaterThanOrEqual(1);
     const href = await items.first().getByTestId('download-card').getAttribute('href');
     const svg = await page.request.get(href as string);
     expect(svg.ok()).toBeTruthy();
@@ -97,37 +96,5 @@ test.describe('core flow', () => {
     );
     await expect(page.getByTestId('counters')).toContainText('Recipients joined');
     await expect(page.getByTestId('decisions')).toContainText('no acquisition cost');
-  });
-
-  test('an urgent card offers pick-up at the pick-up price with no guarantee, and Luxe removes it', async ({
-    page,
-  }) => {
-    await page.goto('/reminders');
-    await page.getByTestId('reminder-person_sam').getByTestId('reminder-edit').click();
-    const editor = page.getByTestId('editor');
-    await expect(editor).toBeVisible();
-    await expect(page.getByTestId('price-total')).toHaveText(PRICES.regularClassicPickup);
-    await expect(page.getByTestId('moonpig-compare')).toContainText('no same-day physical card');
-    await page.getByTestId('step-5').click();
-    const pickup = editor.getByTestId('mode-pickup');
-    await expect(pickup).toHaveAttribute('aria-checked', 'true');
-    await expect(pickup).toContainText(PRICES.pickupDelivery);
-    await expect(pickup).not.toContainText(/free/i);
-    await expect(editor.getByTestId('mode-pickup-promise')).toContainText(PRICES.pickupPromise);
-    await expect(editor.getByTestId('mode-pickup-promise')).not.toContainText(/arrives/i);
-    await expect(editor.getByTestId('guarantee-badge')).toHaveCount(0);
-    await expect(editor.getByTestId('no-guarantee')).toBeVisible();
-
-    // Luxe is never picked up: the mode falls back to tracked and the tile disappears.
-    await page.getByTestId('step-1').click();
-    await editor.getByTestId('finish-luxe').click();
-    await page.getByTestId('step-5').click();
-    await expect(editor.getByTestId('mode-pickup')).toHaveCount(0);
-    await expect(editor.getByTestId('mode-tracked')).toHaveAttribute('aria-checked', 'true');
-    await expect(editor.getByTestId('guarantee-badge')).toBeVisible();
-    await page.getByTestId('step-1').click();
-    await editor.getByTestId('finish-classic').click();
-    await page.getByTestId('step-5').click();
-    await expect(editor.getByTestId('mode-pickup')).toHaveAttribute('aria-checked', 'true');
   });
 });

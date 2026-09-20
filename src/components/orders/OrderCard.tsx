@@ -55,6 +55,7 @@ export function OrderCard({ order: o, qrSvg }: { order: OrderDTO; qrSvg: string 
         <div className="hidden w-[88px] shrink-0 flex-col items-center text-center sm:flex">
           <div
             className="rounded-[8px] bg-white p-1"
+            data-testid="order-qr"
             dangerouslySetInnerHTML={{ __html: qrSvg }}
             role="img"
             aria-label="QR code on the back of the card"

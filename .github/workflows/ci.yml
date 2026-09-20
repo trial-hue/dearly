@@ -47,12 +47,51 @@ jobs:
       - name: docs/pricing.md matches the constants
         run: pnpm docs:pricing:check
       - run: pnpm build
-      - run: pnpm db:migrate
-      - run: pnpm exec tsx prisma/seed.ts --reset
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:e2e
+
+  # Proves the business-model claims in docs/conformance/matrix.md: domain, service, API and UI
+  # layers, with the mock provider and again with no provider configured.
+  conformance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:17-alpine
         env:
-          E2E_BASE_URL: ''
+          POSTGRES_USER: dearly
+          POSTGRES_PASSWORD: dearly
+          POSTGRES_DB: dearly
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U dearly -d dearly" --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://dearly:dearly@localhost:5432/dearly
+      SESSION_SECRET: ci-session-secret-not-for-production-use
+      APP_URL: http://localhost:3000
+      AI_PROVIDER: mock
+      STORAGE_DRIVER: local
+      STORAGE_PATH: ./.data/uploads
+      LOG_LEVEL: warn
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm prisma generate
+      - run: pnpm db:migrate
+      - name: Domain and gateway claims
+        run: pnpm test
+      - name: Service claims (real database)
+        run: pnpm test:service
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Journeys and UI claims, mock provider, phone and desktop
+        run: pnpm test:e2e
+      - name: Journeys 2, 6 and 7 with no provider configured
+        run: pnpm test:e2e:noai
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

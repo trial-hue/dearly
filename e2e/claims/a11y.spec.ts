@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-import { resetDemo } from './helpers';
+import { resetDemo } from '../helpers';
 
 type Violation = { id: string; impact?: string | null; nodes: { target: unknown[] }[] };
 
@@ -15,7 +15,7 @@ function serious(violations: Violation[]): string[] {
 test.describe('accessibility smoke', () => {
   test.beforeEach(async ({ page }) => resetDemo(page));
 
-  test('Home, Browse, Product, Personalise, Reminders and the recipient page have no serious or critical issues', async ({
+  test('I3 Home, Browse, Product, Personalise, Reminders, Basket and the recipient page have no serious or critical issues', async ({
     page,
   }) => {
     for (const url of ['/', '/cards/birthday', '/card/bday-balloon-bunch']) {
@@ -33,6 +33,13 @@ test.describe('accessibility smoke', () => {
         (await new AxeBuilder({ page }).include('[data-testid="editor"]').analyze()).violations,
       ),
     ).toEqual([]);
+
+    await page.evaluate(() =>
+      localStorage.setItem('dearly-basket', JSON.stringify(['person_dan|birthday|2026'])),
+    );
+    await page.goto('/basket');
+    await expect(page.getByTestId('basket-items')).toBeVisible();
+    expect(serious((await new AxeBuilder({ page }).analyze()).violations)).toEqual([]);
 
     await page.goto('/r/seed-dan-birthday-delivered-2025');
     await expect(page.getByTestId('recipient-view')).toBeVisible();

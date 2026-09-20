@@ -174,7 +174,12 @@ export function MediaTools({
           />
           {verdict ? (
             <div className="space-y-2 text-sm">
-              <p className={verdict.ok ? 'text-success' : 'text-warning'}>{verdict.text}</p>
+              <p
+                className={verdict.ok ? 'text-success' : 'text-warning'}
+                data-testid="photo-verdict"
+              >
+                {verdict.text}
+              </p>
               <button
                 type="button"
                 className="btn btn-sm"
@@ -252,7 +257,11 @@ export function MediaTools({
               {card.customFront.kind === 'svg' ? 'Front drawn by AI' : 'Custom front'}
             </Badge>
           ) : null}
-          {card.handwriting ? <Badge>Handwriting inside</Badge> : null}
+          {card.handwriting ? (
+            <span data-testid="handwriting-badge">
+              <Badge>Handwriting inside</Badge>
+            </span>
+          ) : null}
           <button
             type="button"
             className="btn btn-ghost btn-sm"

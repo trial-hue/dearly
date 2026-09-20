@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-import { expectToast, resetDemo } from './helpers';
-import { PRICES } from './prices';
+import { expectToast, resetDemo } from '../helpers';
+import { PRICES } from '../prices';
 
 test.describe('browse to order', () => {
   test.beforeEach(async ({ page }) => resetDemo(page));
@@ -32,6 +32,10 @@ test.describe('browse to order', () => {
     await expect(page.getByTestId('moonpig-compare')).toContainText(
       PRICES.moonpigSavingSignatureAdvance,
     );
+    // The journey continues with a Large Signature card; Large is never compared with Moonpig.
+    await page.getByTestId('size-large').click();
+    await expect(page.getByTestId('price-total')).toHaveText(PRICES.largeSignatureAdvance);
+    await expect(page.getByTestId('moonpig-compare')).toHaveCount(0);
 
     await page.getByTestId('product-personalise').click();
     await expect(page.getByTestId('recipient-dialog')).toBeVisible();
@@ -40,7 +44,8 @@ test.describe('browse to order', () => {
 
     await expect(page).toHaveURL(/\/personalise\//);
     await expect(page.getByTestId('editor')).toBeVisible();
-    await expect(page.getByTestId('price-total')).toHaveText(PRICES.regularSignatureAdvance);
+    await expect(page.getByTestId('price-total')).toHaveText(PRICES.largeSignatureAdvance);
+    await expect(page.getByTestId('size-large')).toHaveAttribute('aria-checked', 'true');
 
     // The customer chooses the date; the delivery rule and the price follow it.
     const iso = (days: number) => {
@@ -51,17 +56,18 @@ test.describe('browse to order', () => {
     await page.getByTestId('step-5').click();
     await page.getByTestId('occasion-date').fill(iso(2));
     await expect(page.getByTestId('mode-tracked')).toHaveAttribute('aria-checked', 'true');
-    await expect(page.getByTestId('price-total')).toHaveText(PRICES.regularSignatureTracked);
+    await expect(page.getByTestId('price-total')).toHaveText(PRICES.largeSignatureTracked);
+    await expect(page.getByTestId('mode-pickup')).toHaveCount(0); // never for Large
     await page.getByTestId('occasion-date').fill(iso(20));
     await expect(page.getByTestId('mode-advance')).toHaveAttribute('aria-checked', 'true');
-    await expect(page.getByTestId('price-total')).toHaveText(PRICES.regularSignatureAdvance);
+    await expect(page.getByTestId('price-total')).toHaveText(PRICES.largeSignatureAdvance);
     await page.getByTestId('add-to-basket').click();
 
     await expect(page).toHaveURL(/\/basket/);
     await expect(
       page.getByTestId('basket-items').locator('[data-testid^="basket-item-"]'),
     ).toHaveCount(1);
-    await expect(page.getByTestId('basket-total')).toHaveText(PRICES.regularSignatureAdvance);
+    await expect(page.getByTestId('basket-total')).toHaveText(PRICES.largeSignatureAdvance);
     await expect(page.getByTestId('guarantee-badge').first()).toBeVisible();
     await page.getByTestId('basket-pay').click();
     await expectToast(page, 'Paid');

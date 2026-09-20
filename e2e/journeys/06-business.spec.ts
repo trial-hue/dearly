@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-import { expectToast, resetDemo } from './helpers';
+import { expectToast, resetDemo } from '../helpers';
 
-test.describe('business sends', () => {
+test.describe('journey 6: business @noai', () => {
   test.beforeEach(async ({ page }) => resetDemo(page));
 
   test('clean the staff list, schedule an office drop, see the batch on Operations', async ({

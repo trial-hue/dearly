@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { expectToast, resetDemo } from './helpers';
+import { expectToast, resetDemo } from '../helpers';
 
 /**
  * Every AI feature works with no provider. The server under test runs with AI_PROVIDER=mock;
