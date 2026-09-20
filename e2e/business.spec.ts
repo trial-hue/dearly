@@ -1,0 +1,23 @@
+import { expect, test } from '@playwright/test';
+
+import { resetDemo } from './helpers';
+
+test.describe('business sends', () => {
+  test.beforeEach(async ({ page }) => resetDemo(page));
+
+  test('clean the staff list, schedule an office drop, see the batch on Operations', async ({
+    page,
+  }) => {
+    await page.goto('/business');
+    await page.getByRole('radio', { name: /Office drop/ }).click();
+    await page.getByTestId('clean-rules').click();
+    await expect(page.getByTestId('staff-rows')).toContainText('8 ready, 2 flagged');
+    await expect(page.getByTestId('batch-pricing')).toContainText('Total ex VAT');
+    await page.getByTestId('schedule-all').click();
+    await expect(page.getByRole('status')).toContainText('Scheduled 8 cards');
+    await expect(page.getByTestId('batches')).toContainText('Office drop');
+    await page.goto('/operations');
+    await expect(page.getByTestId('ops-batch').first()).toContainText('8 cards by office drop');
+    await expect(page.getByTestId('ops-batch').first()).toContainText('contribution');
+  });
+});
