@@ -2,13 +2,9 @@
  * The twelve card fronts as plain shape lists, so the same design renders as React in the
  * interface and as an SVG string for downloads. Paper colours are fixed in both themes.
  */
-export type Attrs = Record<string, string | number>;
-export interface Shape {
-  tag: 'rect' | 'circle' | 'ellipse' | 'path' | 'line' | 'text' | 'g';
-  attrs: Attrs;
-  text?: string;
-  children?: Shape[];
-}
+import { escapeXml, sceneToSvgString as toSvg, type Attrs, type Shape } from '@/catalogue/scene';
+
+export type { Attrs, Shape };
 
 export interface SceneInput {
   title: string;
@@ -312,21 +308,9 @@ export function sceneFor(design: string, input: SceneInput): Shape[] {
   return fn ? fn(input) : [];
 }
 
-const kebab = (s: string) => s.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
-const escape = (s: string) =>
-  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-function shapeToString(s: Shape): string {
-  const attrs = Object.entries(s.attrs)
-    .map(([k, v]) => `${kebab(k)}="${escape(String(v))}"`)
-    .join(' ');
-  if (s.tag === 'text') return `<text ${attrs}>${escape(s.text ?? '')}</text>`;
-  if (s.children?.length) return `<g ${attrs}>${s.children.map(shapeToString).join('')}</g>`;
-  return `<${s.tag} ${attrs}/>`;
-}
-
 /** A standalone SVG document for downloads. Fonts fall back to system faces outside the app. */
 export function sceneToSvgString(design: string, input: SceneInput): string {
-  const body = sceneFor(design, input).map(shapeToString).join('');
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 264 370" width="264" height="370" role="img" aria-label="${escape(`${input.title} card for ${input.name}`)}">${body}</svg>`;
+  return toSvg(sceneFor(design, input), `${input.title} card for ${input.name}`);
 }
+
+export { escapeXml };
