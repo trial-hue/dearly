@@ -1,0 +1,81 @@
+import { z } from 'zod';
+
+import { getAccountId } from '@/server/auth';
+import { now } from '@/server/clock';
+import { ok, problem, readJson } from '@/server/http';
+import { confirmAddress } from '@/server/services/people';
+import {
+  approveProposal,
+  getProposal,
+  rewriteWithRules,
+  skipProposal,
+  updateCard,
+} from '@/server/services/proposals';
+
+export const dynamic = 'force-dynamic';
+
+const Body = z.discriminatedUnion('action', [
+  z.object({ action: z.literal('edit'), patch: z.record(z.string(), z.unknown()) }),
+  z.object({ action: z.literal('approve') }),
+  z.object({ action: z.literal('skip') }),
+  z.object({ action: z.literal('confirm_address') }),
+  z.object({ action: z.literal('rewrite_rules') }),
+]);
+
+type Params = { params: Promise<{ key: string }> };
+
+export async function GET(_req: Request, { params }: Params) {
+  const { key } = await params;
+  const view = await getProposal(decodeURIComponent(key), now());
+  return view ? ok(view) : problem(404, 'Proposal not found');
+}
+
+export async function PATCH(req: Request, { params }: Params) {
+  const { key: raw } = await params;
+  const key = decodeURIComponent(raw);
+  const body = await readJson(req, Body);
+  if (!body.ok) return body.response;
+  const accountId = await getAccountId();
+  const today = now();
+  switch (body.data.action) {
+    case 'edit': {
+      try {
+        const view = await updateCard(key, body.data.patch, today);
+        return view ? ok(view) : problem(404, 'Proposal not found');
+      } catch (err) {
+        return problem(400, 'Invalid card', err instanceof Error ? err.message : undefined);
+      }
+    }
+    case 'approve': {
+      const result = await approveProposal(key, accountId, today);
+      if (!result.ok) {
+        const messages: Record<string, string> = {
+          not_found: 'Proposal not found',
+          not_proposed: 'This proposal was already decided',
+          address_stale: 'Confirm the address first: it was last checked over a year ago',
+          paused: 'Cards for this person are paused',
+        };
+        return problem(
+          result.reason === 'not_found' ? 404 : 409,
+          messages[result.reason] ?? 'Cannot approve',
+          result.reason,
+        );
+      }
+      return ok(result);
+    }
+    case 'skip':
+      return (await skipProposal(key))
+        ? ok({ skipped: true })
+        : problem(409, 'This proposal was already decided');
+    case 'confirm_address': {
+      const view = await getProposal(key, today);
+      if (!view) return problem(404, 'Proposal not found');
+      await confirmAddress(view.personId, today);
+      return ok(await getProposal(key, today));
+    }
+    case 'rewrite_rules': {
+      const view = await rewriteWithRules(key, today);
+      return view ? ok(view) : problem(404, 'Proposal not found');
+    }
+  }
+}
