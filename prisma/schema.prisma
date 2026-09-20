@@ -1,0 +1,330 @@
+// Dearly pilot data model. Money is integer pence; timestamps are UTC.
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String          @id @default(cuid())
+  name              String
+  email             String          @unique
+  isDemo            Boolean         @default(false)
+  savedSignatureKey String?
+  consents          Json            @default("{}")
+  createdAt         DateTime        @default(now())
+  people            Person[]
+  orders            Order[]
+  media             Media[]
+  inventory         InventoryItem[]
+  referrals         Referral[]
+}
+
+model Person {
+  id            String     @id @default(cuid())
+  accountId     String
+  account       Account    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name          String
+  relationship  String
+  address       String?
+  postcode      String?
+  addrCheckedAt DateTime?
+  pausedReason  String?
+  pausedAt      DateTime?
+  note          String?
+  createdAt     DateTime   @default(now())
+  occasions     Occasion[]
+  proposals     Proposal[]
+  orders        Order[]
+  referrals     Referral[]
+
+  @@index([accountId])
+}
+
+model Occasion {
+  id        String     @id @default(cuid())
+  personId  String
+  person    Person     @relation(fields: [personId], references: [id], onDelete: Cascade)
+  type      String
+  monthDay  String?
+  feastKey  String?
+  startYear Int?
+  adhocDate String?
+  createdAt DateTime   @default(now())
+  proposals Proposal[]
+
+  @@index([personId])
+}
+
+model Proposal {
+  id         String   @id @default(cuid())
+  key        String   @unique
+  personId   String
+  person     Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  occasionId String
+  occasion   Occasion @relation(fields: [occasionId], references: [id], onDelete: Cascade)
+  status     String   @default("proposed")
+  cardSpec   Json
+  aiReason   String?
+  madeBy     String   @default("rule")
+  messageBy  String   @default("rule")
+  flags      Json     @default("[]")
+  dueDate    DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  orders     Order[]
+
+  @@index([personId])
+  @@index([status, dueDate])
+}
+
+model Order {
+  id            String       @id @default(cuid())
+  accountId     String
+  account       Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  proposalId    String?
+  proposal      Proposal?    @relation(fields: [proposalId], references: [id], onDelete: SetNull)
+  personId      String?
+  person        Person?      @relation(fields: [personId], references: [id], onDelete: SetNull)
+  recipientName String
+  occasionType  String
+  occasionDate  DateTime
+  cardSpec      Json
+  quote         Json
+  totalPence    Int
+  mode          String
+  promisedDate  DateTime
+  guarantee     Boolean      @default(false)
+  stage         String       @default("checked")
+  stageHistory  Json         @default("[]")
+  delayed       Boolean      @default(false)
+  printerId     String?
+  printer       Printer?     @relation(fields: [printerId], references: [id], onDelete: SetNull)
+  batchId       String?
+  batch         Batch?       @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  recipientSlug String       @unique
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  shipments     Shipment[]
+  recovery      Recovery?
+  digitalCard   DigitalCard?
+  rating        Rating?
+  decisions     Decision[]
+  inventory     InventoryItem[]
+
+  @@index([accountId, createdAt])
+  @@index([stage])
+}
+
+model Shipment {
+  id              String   @id @default(cuid())
+  orderId         String
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  printerId       String?
+  printer         Printer? @relation(fields: [printerId], references: [id], onDelete: SetNull)
+  kind            String   @default("first")
+  carrier         String?
+  trackingEvents  Json     @default("[]")
+  inspectionScore Float?
+  createdAt       DateTime @default(now())
+
+  @@index([orderId])
+}
+
+model Recovery {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actions   Json
+  costPence Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Media {
+  id         String   @id @default(cuid())
+  accountId  String
+  account    Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  kind       String
+  storageKey String
+  mimeType   String
+  sizeBytes  Int
+  width      Int?
+  height     Int?
+  durationMs Int?
+  checks     Json     @default("{}")
+  createdAt  DateTime @default(now())
+
+  @@index([accountId])
+}
+
+model DigitalCard {
+  id           String          @id @default(cuid())
+  orderId      String          @unique
+  order        Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  slug         String          @unique
+  animation    String          @default("envelope")
+  narrationKey String?
+  narrationUrl String?
+  clipUrl      String?
+  drawingUrl   String?
+  wordTimings  Json            @default("[]")
+  expiresAt    DateTime?
+  createdAt    DateTime        @default(now())
+  inventory    InventoryItem[]
+}
+
+model InventoryItem {
+  id            String       @id @default(cuid())
+  accountId     String
+  account       Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  digitalCardId String?
+  digitalCard   DigitalCard? @relation(fields: [digitalCardId], references: [id], onDelete: SetNull)
+  orderId       String?
+  order         Order?       @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  direction     String
+  fromName      String
+  toName        String
+  occasionType  String
+  design        String
+  message       String
+  receivedAt    DateTime
+  keptUntil     DateTime
+  cardSpec      Json?
+  createdAt     DateTime     @default(now())
+
+  @@index([accountId, direction])
+  @@index([orderId])
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  stars     Int
+  comment   String?
+  createdAt DateTime @default(now())
+}
+
+model Printer {
+  id        String     @id
+  name      String
+  city      String
+  sizes     String[]
+  finishes  String[]
+  areas     String[]
+  capacity  Int
+  score     Float
+  simulated Boolean    @default(true)
+  orders    Order[]
+  shipments Shipment[]
+}
+
+model Organisation {
+  id             String     @id @default(cuid())
+  name           String
+  plan           String     @default("payg")
+  deliveryOption String     @default("posted")
+  staffText      String     @default("")
+  createdAt      DateTime   @default(now())
+  staff          StaffRow[]
+  batches        Batch[]
+}
+
+model StaffRow {
+  id             String       @id @default(cuid())
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  raw            String
+  name           String
+  date           String?
+  monthDay       String?
+  occasion       String
+  postcode       String
+  issue          String?
+  createdAt      DateTime     @default(now())
+
+  @@index([organisationId])
+}
+
+model Batch {
+  id                String       @id @default(cuid())
+  organisationId    String
+  organisation      Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  sendDate          DateTime
+  deliveryOption    String
+  finish            String
+  cardCount         Int
+  giantCount        Int          @default(0)
+  pricePence        Int
+  contributionPence Int
+  rows              Json
+  status            String       @default("scheduled")
+  createdAt         DateTime     @default(now())
+  orders            Order[]
+
+  @@index([organisationId])
+}
+
+model Partner {
+  id            String     @id @default(cuid())
+  type          String
+  name          String
+  city          String?
+  feePence      Int        @default(0)
+  commissionPct Int        @default(0)
+  simulated     Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  referrals     Referral[]
+}
+
+model Referral {
+  id        String   @id @default(cuid())
+  partnerId String
+  partner   Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  personId  String?
+  person    Person?  @relation(fields: [personId], references: [id], onDelete: SetNull)
+  ledger    Json
+  createdAt DateTime @default(now())
+
+  @@index([partnerId])
+}
+
+model Decision {
+  id             String   @id @default(cuid())
+  at             DateTime @default(now())
+  actor          String
+  job            String
+  summary        String
+  costMicroPence Int      @default(0)
+  orderId        String?
+  order          Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([at])
+}
+
+model Job {
+  id        String    @id @default(cuid())
+  type      String
+  payload   Json
+  runAt     DateTime
+  status    String    @default("queued")
+  attempts  Int       @default(0)
+  lastError String?
+  createdAt DateTime  @default(now())
+  ranAt     DateTime?
+
+  @@index([status, runAt])
+}
+
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
