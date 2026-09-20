@@ -8,6 +8,7 @@ import {
   approveProposal,
   getProposal,
   rewriteWithRules,
+  setProposalDate,
   skipProposal,
   updateCard,
 } from '@/server/services/proposals';
@@ -20,6 +21,7 @@ const Body = z.discriminatedUnion('action', [
   z.object({ action: z.literal('skip') }),
   z.object({ action: z.literal('confirm_address') }),
   z.object({ action: z.literal('rewrite_rules') }),
+  z.object({ action: z.literal('set_date'), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }),
 ]);
 
 type Params = { params: Promise<{ key: string }> };
@@ -76,6 +78,14 @@ export async function PATCH(req: Request, { params }: Params) {
     case 'rewrite_rules': {
       const view = await rewriteWithRules(key, today);
       return view ? ok(view) : problem(404, 'Proposal not found');
+    }
+    case 'set_date': {
+      try {
+        const view = await setProposalDate(key, body.data.date, today);
+        return view ? ok(view) : problem(409, 'This proposal was already decided');
+      } catch (err) {
+        return problem(400, 'Cannot use that date', err instanceof Error ? err.message : undefined);
+      }
     }
   }
 }

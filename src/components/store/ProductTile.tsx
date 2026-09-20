@@ -10,10 +10,11 @@ import { fromPricePence } from '@/lib/pricing';
 export function ProductTile({
   design,
   badge,
-  priority = false,
+  href,
 }: {
   design: DesignDef;
   badge?: string;
+  href?: string;
   priority?: boolean;
 }) {
   const label =
@@ -25,7 +26,7 @@ export function ProductTile({
         : undefined);
   return (
     <Link
-      href={`/card/${design.id}`}
+      href={href ?? `/card/${design.id}`}
       className="tile group block overflow-hidden"
       data-testid={`product-tile-${design.id}`}
       aria-label={`${design.title}, from ${formatPence(fromPricePence())}`}
@@ -36,7 +37,7 @@ export function ProductTile({
           title={TITLES[design.occasions[0] ?? 'birthday']}
           name=""
           tint={design.tint}
-          priority={priority}
+
           className="rounded-b-none"
         />
         {label ? <span className="label label-tint absolute left-3 top-3">{label}</span> : null}

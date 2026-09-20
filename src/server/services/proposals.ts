@@ -17,6 +17,7 @@ import {
   isoDate,
   messageFor,
   nextDate,
+  parseIsoDate,
   proposalsDue,
   quote,
   route,
@@ -472,9 +473,11 @@ export async function createAdhocProposal(
   if (!draft) return null;
   const existing = await prisma.proposal.findUnique({ where: { key: draft.key } });
   if (existing) {
+    // The customer asked for this date: move the existing proposal rather than ignoring it (ADR 0005).
+    await prisma.occasion.delete({ where: { id: occasion.id } });
     if (existing.status !== 'proposed')
       await prisma.proposal.update({ where: { key: draft.key }, data: { status: 'proposed' } });
-    return getProposal(draft.key, today);
+    return setProposalDate(draft.key, input.date, today);
   }
   await prisma.proposal.create({
     data: {
@@ -494,6 +497,43 @@ export async function createAdhocProposal(
     summary: `Added a ${TITLES[input.type].toLowerCase()} card for ${person.name} on ${input.date}`,
   });
   return getProposal(draft.key, today);
+}
+
+/**
+ * Move a proposal to a date the customer chose. The delivery rule is re-applied unless the
+ * customer overrode the mode; an ad hoc occasion moves with it; past dates are rejected (ADR 0005).
+ */
+export async function setProposalDate(
+  key: string,
+  date: string,
+  today: Date,
+): Promise<ProposalView | null> {
+  const row = await prisma.proposal.findUnique({
+    where: { key },
+    include: { person: true, occasion: true },
+  });
+  if (!row || row.status !== 'proposed') return null;
+  const due = parseIsoDate(date);
+  if (!due) throw new Error('Choose a date as YYYY-MM-DD');
+  const daysLeft = daysBetween(startOfDay(today), due);
+  if (daysLeft < 0) throw new Error('That date has passed. Choose today or later.');
+  const card = parseCard(row.cardSpec);
+  const next: CardSpec = { ...card };
+  if (next.mode !== 'ecard') {
+    if (!next.modeOverridden) next.mode = chooseMode(next.size, daysLeft);
+    if (next.size === 'giant') next.mode = 'tracked';
+    if (!allowedModes(next.size).includes(next.mode as 'advance'))
+      next.mode = chooseMode(next.size, daysLeft);
+  }
+  if (row.occasion.adhocDate)
+    await prisma.occasion.update({ where: { id: row.occasionId }, data: { adhocDate: date } });
+  await prisma.proposal.update({ where: { key }, data: { dueDate: due, cardSpec: json(next) } });
+  await decisions.record({
+    actor: 'person',
+    job: 'date',
+    summary: `Moved ${row.person.name}'s ${TITLES[keyType(key)].toLowerCase()} card to ${date}`,
+  });
+  return getProposal(key, today);
 }
 
 /** Open proposals for the AI drafting job, with only the fields the job needs. */

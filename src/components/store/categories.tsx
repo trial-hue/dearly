@@ -88,6 +88,7 @@ export function storeCategories(): Category[] {
         },
       ],
     },
+    { label: 'eCards', href: '/ecards' },
     { label: 'All cards', href: '/cards' },
   ];
 }

@@ -65,6 +65,8 @@ Redirects (permanent): `/today` → `/reminders`, `/people` → `/reminders?tab=
   Every catalogue design serialises under the sanitiser's 20 KB limit (unit-tested).
 - The basket is a per-browser list of proposal keys (localStorage); paying calls the existing
   approve action per key. See ADR 0004.
+- The date a card is for can be chosen in the recipient dialog and moved on the Delivery step;
+  this needed one additive service change and a `set_date` action. See ADR 0005.
 - eCard-only sends with narration, clip, drawing or animation use the existing
   `POST /api/orders/ecard` contract; the source proposal is then skipped so it leaves
   "Ready for you". See ADR 0004.

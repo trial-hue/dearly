@@ -1,6 +1,7 @@
 'use client';
 
 import { GuaranteeBadge } from '@/components/store/GuaranteeBadge';
+import { Field } from '@/components/ui';
 import { MODES, SIZES, allowedModes, arrivalDate, type CardSpec, type PrintedMode } from '@/domain';
 import { fmtDate, formatPence } from '@/lib/format';
 
@@ -9,9 +10,11 @@ export function DeliveryStep({
   dueDate,
   person,
   onMode,
+  onDate,
   onConfirmAddress,
   busy,
 }: {
+  onDate: (date: string) => void;
   card: CardSpec;
   dueDate: string;
   person: { name: string; postcode: string | null; stale: boolean };
@@ -22,8 +25,27 @@ export function DeliveryStep({
   const ecard = card.mode === 'ecard';
   const modes = allowedModes(card.size);
   const first = person.name.split(' ')[0];
+  const todayIso = new Date().toISOString().slice(0, 10);
   return (
     <div className="space-y-4">
+      <Field
+        label="The date it is for"
+        htmlFor="occasion-date"
+        hint="Move it and the delivery and price follow."
+      >
+        <input
+          id="occasion-date"
+          type="date"
+          className="input"
+          value={dueDate.slice(0, 10)}
+          min={todayIso}
+          disabled={busy}
+          data-testid="occasion-date"
+          onChange={(e) => {
+            if (e.target.value) onDate(e.target.value);
+          }}
+        />
+      </Field>
       {ecard ? (
         <p className="rounded-[12px] bg-surface-2 p-3 text-sm">
           Sent by link today, straight to {first}. Nothing to post.

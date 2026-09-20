@@ -101,6 +101,18 @@ export function PersonaliseEditor({
       on ? { mode: 'ecard' } : { mode: chooseMode(card.size, daysLeft), modeOverridden: false },
     );
   const onMode = (m: PrintedMode) => patch({ mode: m });
+  const onDate = (date: string) =>
+    run(
+      'date',
+      async () =>
+        applyView(
+          await api<ProposalDTO>(`/api/proposals/${key}`, {
+            method: 'PATCH',
+            json: { action: 'set_date', date },
+          }),
+        ),
+      { refresh: false },
+    );
   const commitMessage = () => {
     if (message !== card.message) void patch({ message });
   };
@@ -282,6 +294,7 @@ export function PersonaliseEditor({
           dueDate={p.dueDate}
           person={{ name: p.person.name, postcode: p.person.postcode, stale: p.person.stale }}
           onMode={(m) => void onMode(m)}
+          onDate={(d) => void onDate(d)}
           onConfirmAddress={() => void confirmAddress()}
           busy={isBusy}
         />

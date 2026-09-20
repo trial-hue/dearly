@@ -21,8 +21,15 @@ export async function generateMetadata({
   return { title: design ? design.title : 'Card' };
 }
 
-export default async function ProductPage({ params }: { params: Promise<{ designId: string }> }) {
+export default async function ProductPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ designId: string }>;
+  searchParams: Promise<{ ecard?: string }>;
+}) {
   const { designId } = await params;
+  const { ecard } = await searchParams;
   const design = designById(designId);
   if (!design) notFound();
   const occasion = design.occasions[0] ?? 'birthday';
@@ -55,7 +62,7 @@ export default async function ProductPage({ params }: { params: Promise<{ design
               </span>
             </p>
             <div className="mt-5">
-              <ProductOptions designId={design.id} />
+              <ProductOptions designId={design.id} initialEcard={ecard === '1'} />
             </div>
           </div>
         </div>

@@ -47,11 +47,11 @@ docker compose up --build
 
 ## Three layouts and the route map
 
-| Layout                                                                   | Routes                                                                                                                                                                                        |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A. Storefront (top header, category row, footer, phone tab bar)          | `/`, `/cards`, `/cards/[occasion]`, `/card/[designId]`, `/personalise/[key]`, `/reminders`, `/basket`, `/orders`, `/my-cards`, `/help`, `/account`, and the public recipient page `/r/[slug]` |
-| B. Dearly for Business (own header, denser)                              | `/business`, `/business/send`, `/business/pricing`                                                                                                                                            |
-| C. Dearly HQ (dashboard style, reached only from the footer's Demo menu) | `/hq/operations`, `/hq/partners`, `/hq/kit`                                                                                                                                                   |
+| Layout                                                                   | Routes                                                                                                                                                                                                   |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A. Storefront (top header, category row, footer, phone tab bar)          | `/`, `/cards`, `/cards/[occasion]`, `/ecards`, `/card/[designId]`, `/personalise/[key]`, `/reminders`, `/basket`, `/orders`, `/my-cards`, `/help`, `/account`, and the public recipient page `/r/[slug]` |
+| B. Dearly for Business (own header, denser)                              | `/business`, `/business/send`, `/business/pricing`                                                                                                                                                       |
+| C. Dearly HQ (dashboard style, reached only from the footer's Demo menu) | `/hq/operations`, `/hq/partners`, `/hq/kit`                                                                                                                                                              |
 
 The old routes redirect: `/today` and `/people` to `/reminders`, `/studio` to `/cards`, `/inventory` to `/my-cards`, `/florists` to `/hq/partners`, `/operations` to `/hq/operations`. `docs/design/restructure.md` maps every feature to its home.
 

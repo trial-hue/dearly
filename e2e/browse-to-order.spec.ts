@@ -35,6 +35,20 @@ test.describe('browse to order', () => {
     await expect(page).toHaveURL(/\/personalise\//);
     await expect(page.getByTestId('editor')).toBeVisible();
     await expect(page.getByTestId('price-total')).toHaveText('£4.94');
+
+    // The customer chooses the date; the delivery rule and the price follow it.
+    const iso = (days: number) => {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      return d.toISOString().slice(0, 10);
+    };
+    await page.getByTestId('step-5').click();
+    await page.getByTestId('occasion-date').fill(iso(2));
+    await expect(page.getByTestId('mode-tracked')).toHaveAttribute('aria-checked', 'true');
+    await expect(page.getByTestId('price-total')).toHaveText('£6.74');
+    await page.getByTestId('occasion-date').fill(iso(20));
+    await expect(page.getByTestId('mode-advance')).toHaveAttribute('aria-checked', 'true');
+    await expect(page.getByTestId('price-total')).toHaveText('£4.94');
     await page.getByTestId('add-to-basket').click();
 
     await expect(page).toHaveURL(/\/basket/);

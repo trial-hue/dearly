@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 import { designsFor, designsWithTag } from '@/catalogue';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
@@ -7,7 +8,9 @@ import { Hero } from '@/components/store/Hero';
 import { OccasionTile } from '@/components/store/OccasionTile';
 import { ProductTile } from '@/components/store/ProductTile';
 import { ReassuranceRow } from '@/components/store/ReassuranceRow';
+import { quote } from '@/domain';
 import { nextDate, type OccasionType } from '@/domain';
+import { formatPence } from '@/lib/format';
 import { OCCASION_LABELS, OCCASION_SLUGS } from '@/lib/occasions';
 import { serialize } from '@/lib/serialize';
 import { getAccountId } from '@/server/auth';
@@ -85,6 +88,23 @@ export default async function HomePage() {
           <ProductTile key={d.id} design={d} badge="Add a photo" />
         ))}
       </Carousel>
+      <section className="container-x section !pb-0" aria-label="eCards">
+        <div className="flex flex-wrap items-center gap-4 rounded-[16px] bg-lilac p-6 md:p-8">
+          <div className="min-w-0 flex-1">
+            <h2 className="t-h2">Need it today? Send an eCard</h2>
+            <p className="mt-1 text-ink-2">
+              Any design by link for{' '}
+              {formatPence(
+                quote({ size: 'regular', finish: 'signature', mode: 'ecard' }).totalPence,
+              )}
+              , with your voice reading the message, a clip and an opening animation.
+            </p>
+          </div>
+          <Link href="/ecards" className="btn btn-primary btn-lg" data-testid="home-ecards">
+            Choose an eCard
+          </Link>
+        </div>
+      </section>
       <Carousel
         title={`Coming up: ${OCCASION_LABELS[feast]}`}
         seeAllHref={`/cards/${OCCASION_SLUGS[feast]}`}

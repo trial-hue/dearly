@@ -21,12 +21,14 @@ export function RecipientDialog({
   design,
   size,
   finish,
+  ecard = false,
 }: {
   open: boolean;
   onClose: () => void;
   design: DesignDef;
   size: Size;
   finish: Finish;
+  ecard?: boolean;
 }) {
   const router = useRouter();
   const { run, busy, error } = useAction();
@@ -83,7 +85,15 @@ export function RecipientDialog({
         });
         await api(`/api/proposals/${encodeURIComponent(view.key)}`, {
           method: 'PATCH',
-          json: { action: 'edit', patch: { size, finish, customFront: { kind: 'svg', svg } } },
+          json: {
+            action: 'edit',
+            patch: {
+              size,
+              finish,
+              customFront: { kind: 'svg', svg },
+              ...(ecard ? { mode: 'ecard' } : {}),
+            },
+          },
         });
         router.push(`/personalise/${encodeURIComponent(view.key)}?from=shop`);
       },
@@ -91,7 +101,12 @@ export function RecipientDialog({
     );
 
   return (
-    <Dialog open={open} onClose={onClose} title="Who is this card for?" testId="recipient-dialog">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      title={ecard ? 'Who is this eCard for?' : 'Who is this card for?'}
+      testId="recipient-dialog"
+    >
       {people === null ? (
         <div className="skeleton h-32" aria-busy="true" />
       ) : people.length === 0 ? (
@@ -159,7 +174,7 @@ export function RecipientDialog({
               data-testid="recipient-continue"
               onClick={() => void cont()}
             >
-              {busy ? 'Setting up…' : 'Personalise this card'}
+              {busy ? 'Setting up…' : ecard ? 'Personalise the eCard' : 'Personalise this card'}
             </button>
           </div>
         </div>

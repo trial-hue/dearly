@@ -20,6 +20,11 @@ What was done, in commit order: the restructure plan, test selectors moved to `d
 | Visual snapshots for 8 key screens at two sizes; axe and Lighthouse targets                                               | 16 PNGs in `docs/design/screens/`; axe clean on Home, Browse, Product, Personalise, Reminders and the recipient page; Lighthouse performance 92 and accessibility 100 on Home (throttled, Playwright's Chromium) |
 | README and architecture updated with the three layouts and the route map                                                  | Done                                                                                                                                                                                                             |
 
+Two follow-ups after review:
+
+- **Choosing a date.** The recipient dialog's date was silently ignored when a proposal for that person and occasion already existed this year, and the editor had no date control. `setProposalDate` in the proposals service and a `set_date` action on the proposal endpoint fix both (ADR 0005, the one deliberate service change of the rebuild); the Delivery step now carries the date, and the browse-to-order scenario moves it and checks that the mode and price follow.
+- **eCards.** The studio's features were inside Personalise behind the "Send as eCard only" toggle with no entry point. There is now an eCards link in the category row, an `/ecards` page, an eCard option on every product page that presets the eCard path, and a home module; the `ecard` scenario sends one with narration.
+
 Not finished or worth knowing:
 
 - Lighthouse was measured locally with `lighthouse@12` against the production build; it is not in CI, and the score moves a few points between runs (83 to 92 seen) because the LCP is the hero heading waiting on the display font.
