@@ -249,7 +249,7 @@ export const work: DesignDef[] = [
     scene: (i) => [
       ...bg(P.paper.bg),
       ...laurel(W / 2, 150, 92, P.paper.d),
-      ...numeral(i.age, 174, 84, P.paper.ink, '★'),
+      ...numeral(i.age, 174, 84, P.paper.ink, '10'),
       ...title(i.age === 1 ? 'year' : 'years', 208, {
         size: 16,
         weight: 600,
@@ -293,7 +293,7 @@ export const work: DesignDef[] = [
       ...bg(P.sky.bg),
       ...confetti(171, 46, [P.sky.a, P.sky.c, P.sky.d, '#FFFFFF']),
       { tag: 'circle', attrs: { cx: W / 2, cy: 160, r: 92, fill: '#FFFFFF' } },
-      ...numeral(i.age, 190, 96, P.sky.a, '★'),
+      ...numeral(i.age, 190, 96, P.sky.a, '5'),
       ...title('years of you', 226, { font: 'hand', size: 26, weight: 700, color: P.sky.ink }),
       ...titleLines(twoLines(i.title), 300, 26, { size: 22, color: P.sky.ink }),
       ...nameLine(i.name, 348, P.sky.a, 22),

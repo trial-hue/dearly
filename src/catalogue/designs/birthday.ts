@@ -64,7 +64,7 @@ export const birthday: DesignDef[] = [
     scene: (i) => [
       ...bg(P.butter.bg),
       ...diagonalStripes(P.butter.a, 7, 18, 0.14),
-      ...numeral(i.age, 205, i.age != null && i.age >= 100 ? 130 : 168, P.butter.b),
+      ...numeral(i.age, 205, i.age != null && i.age >= 100 ? 130 : 168, P.butter.b, '40'),
       ...banner(W / 2, 262, 176, 34, P.butter.c, i.title, '#FFFFFF', 15),
       ...sparkles(3, 8, P.butter.a, { x: 20, y: 40, w: W - 40, h: 130 }, 6),
       ...nameLine(i.name, 330, P.butter.ink, 24),
@@ -300,7 +300,7 @@ export const birthday: DesignDef[] = [
       ...sparkles(31, 34, P.night.a, undefined, 4),
       ...star5(40, 56, 12, P.night.d),
       ...star5(222, 300, 10, P.night.c),
-      ...numeral(i.age, 208, i.age != null && i.age >= 100 ? 120 : 150, P.night.a),
+      ...numeral(i.age, 208, i.age != null && i.age >= 100 ? 120 : 150, P.night.a, '30'),
       ...title('years of brilliant', 252, {
         font: 'hand',
         size: 34,
