@@ -11,12 +11,12 @@ import {
   type CardSpec,
   type OccasionType,
 } from '@/domain';
-import { getStorage } from '@/server/adapters/storage';
 import { prisma } from '@/server/db';
 import { newSlug } from '@/server/ids';
 import { json } from '@/server/json';
 
 import * as decisions from './decisionLog';
+import { mediaUrl } from './media';
 import { toOccasionLike } from './people';
 import { SENDER } from './proposals';
 
@@ -31,12 +31,6 @@ export interface SendEcardInput {
   narrationMediaId: string | null;
   clipMediaId: string | null;
   wordTimings: number[];
-}
-
-async function mediaUrl(id: string | null): Promise<string | null> {
-  if (!id) return null;
-  const m = await prisma.media.findUnique({ where: { id } });
-  return m ? getStorage().url(m.storageKey) : null;
 }
 
 /** Send a rich eCard now: a delivered order, its digital card and an Inventory copy. */

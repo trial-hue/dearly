@@ -4,7 +4,7 @@ import { daysLabel, fmtDate } from '@/lib/format';
 import { OCCASION_LABELS } from '@/lib/occasions';
 import type { TodayScreen } from '@/server/services/proposals';
 
-import { reminderHeadline } from './ReminderCard';
+import { reminderHeadline } from './headline';
 
 const monthOf = (d: Date | string) =>
   new Date(d).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });

@@ -199,6 +199,31 @@ describe('canonical quotes', () => {
   });
 });
 
+describe('guarantee code', () => {
+  it('takes 50% off the card price only, once, never on top of a free first card', () => {
+    const q = quote({
+      size: 'regular',
+      finish: 'signature',
+      mode: 'advance',
+      nextCardDiscount: true,
+    });
+    expect(q.discountPence).toBe(200);
+    expect(q.cardPence).toBe(199);
+    expect(q.deliveryPence).toBe(95);
+    expect(q.totalPence).toBe(294);
+    expect(q.lines.some((l) => /guarantee code/.test(l.label) && l.pence === -200)).toBe(true);
+    const free = quote({
+      size: 'regular',
+      finish: 'signature',
+      mode: 'advance',
+      nextCardDiscount: true,
+      firstCardFree: true,
+    });
+    expect(free.discountPence).toBe(0);
+    expect(free.cardPence).toBe(0);
+  });
+});
+
 describe('business pricing', () => {
   it('matches the specified contributions per card', () => {
     expect(businessUnitContributionPence(businessUnitPricePence(100, 'posted'), 'posted')).toBe(

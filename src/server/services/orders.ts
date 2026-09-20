@@ -187,6 +187,14 @@ async function ensureSentInventory(row: OrderRow): Promise<void> {
   });
 }
 
+/** Stages past which a hold no longer applies: the card has left the building. */
+const HELD_PAST: ReadonlySet<Stage> = new Set<Stage>([
+  'posted',
+  'ready_for_pickup',
+  'delivered',
+  'collected',
+]);
+
 /** "Run the next step": every open order moves one stage, with the partner adapters called. */
 export async function advanceAll(accountId: string, today: Date): Promise<{ moved: number }> {
   const rows = await prisma.order.findMany({ where: { accountId }, include: orderInclude });
@@ -197,6 +205,20 @@ export async function advanceAll(accountId: string, today: Date): Promise<{ move
     const mode = row.mode as Mode;
     const next = nextStage({ mode, stage: row.stage as Stage });
     if (!next) continue;
+    // A paused person's card is held before it is printed or posted, as well as never proposed.
+    if (row.person?.pausedReason && !HELD_PAST.has(row.stage as Stage)) {
+      const already = await prisma.decision.findFirst({
+        where: { orderId: row.id, job: 'fulfilment', summary: { startsWith: 'Held ' } },
+      });
+      if (!already)
+        await decisions.record({
+          actor: 'rule',
+          job: 'fulfilment',
+          summary: `Held ${row.recipientName}'s card: cards for ${row.recipientName} are paused`,
+          orderId: row.id,
+        });
+      continue;
+    }
     const card = parseCard(row.cardSpec);
     const printerName = row.printer
       ? `${row.printer.name} (${row.printer.city})`
@@ -392,22 +414,32 @@ export async function rateOrder(
   return true;
 }
 
-/** "Save to my Dearly": the recipient keeps the card and becomes a customer at no acquisition cost. */
-export async function saveToInventory(slug: string, viewerAccountId: string): Promise<boolean> {
+/**
+ * "Save to my Dearly": the recipient keeps the card and becomes a customer at no acquisition cost.
+ * Their own account is created (no marketing consent), and the received card is filed under it.
+ * Returns the recipient's account id.
+ */
+export async function saveToInventory(slug: string): Promise<{ accountId: string } | null> {
   const row = await prisma.order.findUnique({
     where: { recipientSlug: slug },
     include: { digitalCard: true, account: { select: { name: true } } },
   });
-  if (!row) return false;
-  const existing = await prisma.inventoryItem.findFirst({
-    where: { orderId: row.id, direction: 'received', accountId: viewerAccountId },
+  if (!row) return null;
+  const email = `${row.recipientSlug}@recipient.dearly.invalid`;
+  const account = await prisma.account.upsert({
+    where: { email },
+    update: {},
+    create: { name: row.recipientName, email, isDemo: false, consents: json({}) },
   });
-  if (existing) return true;
+  const existing = await prisma.inventoryItem.findFirst({
+    where: { orderId: row.id, direction: 'received', accountId: account.id },
+  });
+  if (existing) return { accountId: account.id };
   const card = parseCard(row.cardSpec);
   const now = new Date();
   await prisma.inventoryItem.create({
     data: {
-      accountId: viewerAccountId,
+      accountId: account.id,
       orderId: row.id,
       digitalCardId: row.digitalCard?.id ?? null,
       direction: 'received',
@@ -427,7 +459,7 @@ export async function saveToInventory(slug: string, viewerAccountId: string): Pr
     summary: `Recipient ${row.recipientName} joined at no acquisition cost and saved the card to their Dearly`,
     orderId: row.id,
   });
-  return true;
+  return { accountId: account.id };
 }
 
 /** "Send one back": a thank-you reminder a week out for the person who sent the card. */

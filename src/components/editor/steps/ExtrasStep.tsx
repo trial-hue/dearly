@@ -67,7 +67,7 @@ export function ExtrasStep({
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5" data-testid="extras">
       {!ecard ? (
         <>
           <label className="flex items-start gap-3 text-sm">
@@ -75,6 +75,7 @@ export function ExtrasStep({
               type="checkbox"
               className="mt-1"
               checked={card.digital}
+              data-testid="digital-copy"
               disabled={busy}
               onChange={(e) => onCard({ digital: e.target.checked })}
             />
@@ -106,7 +107,7 @@ export function ExtrasStep({
         </>
       ) : null}
 
-      {ecard ? (
+      {ecard || card.digital ? (
         <>
           <section>
             <h3 className="mb-2 text-sm font-bold">Animation</h3>
@@ -134,6 +135,7 @@ export function ExtrasStep({
             <div className="flex flex-wrap gap-2">
               {recording === 'audio' ? (
                 <button
+                  data-testid="stop-recording"
                   type="button"
                   className="btn btn-primary btn-sm"
                   onClick={() => stopRef.current?.()}
@@ -157,6 +159,7 @@ export function ExtrasStep({
                   type="file"
                   accept="audio/*"
                   className="sr-only"
+                  data-testid="upload-narration"
                   onChange={async (e) => {
                     const f = e.target.files?.[0];
                     if (f)
@@ -192,7 +195,7 @@ export function ExtrasStep({
               ) : null}
             </div>
             {recording === 'blocked' ? (
-              <p className="mt-2 text-sm text-warning">
+              <p data-testid="recording-blocked" className="mt-2 text-sm text-warning">
                 The microphone is blocked or unavailable. Upload a recording or use the built-in
                 voice.
               </p>

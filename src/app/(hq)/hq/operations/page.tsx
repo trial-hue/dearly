@@ -107,9 +107,10 @@ export default async function OperationsPage() {
           </tbody>
         </table>
       </div>
-      <p className="muted mt-1 text-xs">
-        Moonpig figures from its published reports and help pages. Dearly figures are pilot
-        assumptions.
+      <p className="muted mt-1 text-xs" data-testid="thesis-footnote">
+        Sources: Moonpig Group plc annual report FY26 (customers, orders, marketing spend) and FY24
+        (data and technology staff), and Moonpig help pages (customer care hours, card stock).
+        Dearly figures are pilot assumptions.
       </p>
 
       <h2 className="section-title">Three roles</h2>

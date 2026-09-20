@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { GuaranteeBadge } from '@/components/store/GuaranteeBadge';
 import { Field } from '@/components/ui';
 import {
@@ -8,6 +10,7 @@ import {
   SIZES,
   allowedModes,
   arrivalDate,
+  isoDate,
   toPence,
   type CardSpec,
   type PrintedMode,
@@ -21,9 +24,11 @@ export function DeliveryStep({
   onMode,
   onDate,
   onConfirmAddress,
+  onCode,
   busy,
 }: {
   onDate: (date: string) => void;
+  onCode: (code: string) => void;
   card: CardSpec;
   dueDate: string;
   person: { name: string; postcode: string | null; stale: boolean };
@@ -34,7 +39,8 @@ export function DeliveryStep({
   const ecard = card.mode === 'ecard';
   const modes = allowedModes(card.size, card.finish);
   const first = person.name.split(' ')[0];
-  const todayIso = new Date().toISOString().slice(0, 10);
+  const [code, setCode] = useState('');
+  const todayIso = isoDate(new Date());
   return (
     <div className="space-y-4">
       <Field
@@ -46,7 +52,7 @@ export function DeliveryStep({
           id="occasion-date"
           type="date"
           className="input"
-          value={dueDate.slice(0, 10)}
+          value={isoDate(new Date(dueDate))}
           min={todayIso}
           disabled={busy}
           data-testid="occasion-date"
@@ -113,6 +119,41 @@ export function DeliveryStep({
               </p>
             ) : (
               <p className="mt-1 text-ink-2">Checked within the year.</p>
+            )}
+          </div>
+          <div className="rounded-[12px] bg-surface-2 p-3 text-sm" data-testid="guarantee-code">
+            {card.guaranteeCode ? (
+              <p>
+                Code <span className="font-mono font-bold">{card.guaranteeCode}</span> applied: 50%
+                off this card&rsquo;s price, delivery as shown.
+              </p>
+            ) : (
+              <form
+                className="flex items-end gap-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (code.trim()) onCode(code.trim());
+                }}
+              >
+                <Field label="Have a guarantee code?" htmlFor="guarantee-code-input">
+                  <input
+                    id="guarantee-code-input"
+                    className="input font-mono uppercase"
+                    value={code}
+                    disabled={busy}
+                    data-testid="code-input"
+                    onChange={(e) => setCode(e.target.value)}
+                  />
+                </Field>
+                <button
+                  type="submit"
+                  className="btn btn-sm"
+                  disabled={busy || !code.trim()}
+                  data-testid="code-apply"
+                >
+                  Apply
+                </button>
+              </form>
             )}
           </div>
           {MODES[card.mode].guarantee ? (

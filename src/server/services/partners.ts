@@ -84,7 +84,7 @@ export async function createReferral(reading: FloristReading, readBy: 'ai' | 'ru
     {
       actor: 'rule',
       job: 'referral',
-      summary: `Reminder set for ${customer}: ${reading.recipient}'s ${reading.occasion}${ledger.nextDate ? ` on ${ledger.nextDate}` : ''}, free first card; ${formatPence(ledger.referralFeePence)} owed to ${partner.name}; ${formatPence(ledger.expectedCommissionPence)} commission expected next year`,
+      summary: `Reminder set for ${customer}: ${reading.recipient}'s ${reading.occasion}${ledger.nextDate ? ` on ${ledger.nextDate}` : ''}, first card free with three dates; ${formatPence(ledger.referralFeePence)} owed to ${partner.name}; ${formatPence(ledger.expectedCommissionPence)} commission expected next year`,
     },
   ]);
   return referral;

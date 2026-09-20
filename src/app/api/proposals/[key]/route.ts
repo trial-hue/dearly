@@ -1,10 +1,12 @@
 import { z } from 'zod';
 
+import { DigitalExtrasSchema } from '@/domain';
 import { getAccountId } from '@/server/auth';
 import { now } from '@/server/clock';
 import { ok, problem, readJson } from '@/server/http';
 import { confirmAddress } from '@/server/services/people';
 import {
+  applyGuaranteeCode,
   approveProposal,
   getProposal,
   rewriteWithRules,
@@ -17,7 +19,8 @@ export const dynamic = 'force-dynamic';
 
 const Body = z.discriminatedUnion('action', [
   z.object({ action: z.literal('edit'), patch: z.record(z.string(), z.unknown()) }),
-  z.object({ action: z.literal('approve') }),
+  z.object({ action: z.literal('approve'), extras: DigitalExtrasSchema.optional() }),
+  z.object({ action: z.literal('apply_code'), code: z.string().min(4).max(24) }),
   z.object({ action: z.literal('skip') }),
   z.object({ action: z.literal('confirm_address') }),
   z.object({ action: z.literal('rewrite_rules') }),
@@ -49,7 +52,7 @@ export async function PATCH(req: Request, { params }: Params) {
       }
     }
     case 'approve': {
-      const result = await approveProposal(key, accountId, today);
+      const result = await approveProposal(key, accountId, today, body.data.extras);
       if (!result.ok) {
         const messages: Record<string, string> = {
           not_found: 'Proposal not found',
@@ -64,6 +67,14 @@ export async function PATCH(req: Request, { params }: Params) {
         );
       }
       return ok(result);
+    }
+    case 'apply_code': {
+      try {
+        const view = await applyGuaranteeCode(key, body.data.code, accountId, today);
+        return view ? ok(view) : problem(404, 'Proposal not found');
+      } catch (err) {
+        return problem(400, 'Code not applied', err instanceof Error ? err.message : undefined);
+      }
     }
     case 'skip':
       return (await skipProposal(key))

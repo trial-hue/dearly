@@ -75,6 +75,13 @@ export function imageDimensions(
   return null;
 }
 
+/** The public URL of a stored media item, or null. */
+export async function mediaUrl(id: string | null): Promise<string | null> {
+  if (!id) return null;
+  const m = await prisma.media.findUnique({ where: { id } });
+  return m ? getStorage().url(m.storageKey) : null;
+}
+
 export type UploadResult =
   | {
       ok: true;

@@ -30,9 +30,11 @@ test.describe('A. pricing on screen', () => {
     await expect(page.getByTestId('price-total')).toHaveText(PRICES.ecard);
     await expect(page.getByTestId('approve')).toContainText(PRICES.ecard);
     await page.getByTestId('ecard-toggle').uncheck();
-    // Basket, before Pay.
-    await page.getByTestId('add-to-basket').click();
-    await expect(page).toHaveURL(/\/basket/);
+    // Basket, before Pay (the basket holds the proposal's key).
+    await page.evaluate(() =>
+      localStorage.setItem('dearly-basket', JSON.stringify(['person_dan|birthday|2026'])),
+    );
+    await page.goto('/basket');
     await expect(page.getByTestId('basket-total')).toHaveText(PRICES.regularSignatureAdvance);
     await expect(page.getByTestId('basket-pay')).toContainText(PRICES.regularSignatureAdvance);
     // Business schedule, before Schedule.
@@ -117,6 +119,7 @@ test.describe('A. pricing on screen', () => {
     await expect(page.getByTestId('extras')).toContainText(/draw/i);
     await page.getByTestId('digital-copy').uncheck();
     await expect(page.getByTestId('price-total')).toHaveText(PRICES.regularSignatureAdvance);
+    await page.getByTestId('step-1').click();
     await page.getByTestId('ecard-toggle').check();
     await expect(page.getByTestId('price-total')).toHaveText(PRICES.ecard);
     await page.getByTestId('step-4').click();

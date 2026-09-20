@@ -539,6 +539,9 @@ h3 {
     opacity: 1;
   }
   .scroll-x {
+    /* Positioned so absolutely placed descendants (sr-only labels) stay inside the scroller
+       instead of widening the page on phones. */
+    position: relative;
     display: flex;
     gap: 16px;
     overflow-x: auto;

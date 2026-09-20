@@ -99,6 +99,9 @@ export const BUSINESS_COSTS = {
 /** Florist partners: fee owed per new account, commission owed to Dearly on the flower basket. */
 export const FLORIST = { referralFee: 1.5, commissionPct: 7, sampleBasket: 35 } as const;
 
+/** The guarantee: a missed date refunds the order in full and issues a single-use code for this share off the card price of the next order. */
+export const GUARANTEE = { nextCardDiscountPct: 0.5 } as const;
+
 /** Royal Mail stamp prices used only for the "postage saved" estimate on Operations. */
 export const STAMPS = { firstClass: 1.8, secondClass: 0.91 } as const;
 
@@ -119,9 +122,8 @@ export const DEFAULT_COSTS = {
 export const RULES = {
   proposalWindowDays: 35,
   laterWindowDays: 150,
-  proposeDaysAhead: 21,
   inventoryYears: 3,
-  inventoryWarnDays: 30,
+  inventoryWarnDays: 20,
   addressStaleDays: 365,
   ratingWeight: 20,
 } as const;

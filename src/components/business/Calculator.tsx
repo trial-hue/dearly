@@ -56,7 +56,7 @@ export function Calculator() {
         <dd className="text-lg font-bold tabular-nums">{formatPence(r.dearlyPence)}</dd>
         <dt className="muted">Moonpig at {formatPence(BUSINESS.moonpigPerCard * 100)} a card</dt>
         <dd className="text-lg font-bold tabular-nums">{formatPence(r.moonpigPence)}</dd>
-        <dt className="muted">Saving</dt>
+        <dt className="muted">Saving (all figures ex VAT)</dt>
         <dd
           className={`text-lg font-bold tabular-nums ${r.savingPence >= 0 ? 'text-success' : 'text-danger'}`}
         >

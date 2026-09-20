@@ -142,9 +142,63 @@ export function PersonaliseEditor({
       { refresh: false },
     );
 
+  const applyCode = (value: string) =>
+    run(
+      'code',
+      async () =>
+        applyView(
+          await api<ProposalDTO>(`/api/proposals/${key}`, {
+            method: 'PATCH',
+            json: { action: 'apply_code', code: value },
+          }),
+        ),
+      { refresh: false },
+    );
+
+  /** Upload the narration, clip and drawing and return the digital-card extras. */
+  const collectExtras = async () => {
+    let drawingMediaId: string | null = null;
+    let narrationMediaId: string | null = null;
+    let clipMediaId: string | null = null;
+    let wordTimings: number[] = [];
+    if (drawingRef.current && !drawingRef.current.isEmpty()) {
+      const blob = await drawingRef.current.toBlob();
+      if (blob) drawingMediaId = (await uploadMedia('drawing', blob, 'drawing.png')).id;
+    }
+    if (extras.narration && extras.narration.kind !== 'voice') {
+      narrationMediaId = (
+        await uploadMedia(
+          'audio',
+          extras.narration.blob,
+          extras.narration.kind === 'upload' ? 'narration.audio' : 'narration.webm',
+        )
+      ).id;
+      wordTimings = evenTimings(message, extras.narration.duration);
+    }
+    if (extras.clip)
+      clipMediaId = (
+        await uploadMedia(
+          extras.clip.kind === 'video' ? 'video' : 'audio',
+          extras.clip.blob,
+          extras.clip.kind === 'video' ? 'clip.webm' : 'clip.audio',
+        )
+      ).id;
+    return {
+      animation: extras.animation,
+      drawingMediaId,
+      narrationMediaId,
+      clipMediaId,
+      wordTimings,
+    };
+  };
+
   const approve = () =>
     run('pay', async () => {
-      await api(`/api/proposals/${key}`, { method: 'PATCH', json: { action: 'approve' } });
+      // A printed card with the digital copy carries the same extras as an eCard.
+      const body = card.digital
+        ? { action: 'approve', extras: await collectExtras() }
+        : { action: 'approve' };
+      await api(`/api/proposals/${key}`, { method: 'PATCH', json: body });
       basket.remove(p.key);
       toast(`Paid. ${first}'s card is on its way.`);
       router.push('/orders');
@@ -158,32 +212,6 @@ export function PersonaliseEditor({
 
   const sendEcard = () =>
     run('pay', async () => {
-      let drawingMediaId: string | null = null;
-      let narrationMediaId: string | null = null;
-      let clipMediaId: string | null = null;
-      let wordTimings: number[] = [];
-      if (drawingRef.current && !drawingRef.current.isEmpty()) {
-        const blob = await drawingRef.current.toBlob();
-        if (blob) drawingMediaId = (await uploadMedia('drawing', blob, 'drawing.png')).id;
-      }
-      if (extras.narration && extras.narration.kind !== 'voice') {
-        narrationMediaId = (
-          await uploadMedia(
-            'audio',
-            extras.narration.blob,
-            extras.narration.kind === 'upload' ? 'narration.audio' : 'narration.webm',
-          )
-        ).id;
-        wordTimings = evenTimings(message, extras.narration.duration);
-      }
-      if (extras.clip)
-        clipMediaId = (
-          await uploadMedia(
-            extras.clip.kind === 'video' ? 'video' : 'audio',
-            extras.clip.blob,
-            extras.clip.kind === 'video' ? 'clip.webm' : 'clip.audio',
-          )
-        ).id;
       await api('/api/orders/ecard', {
         json: {
           personId: p.personId,
@@ -191,11 +219,7 @@ export function PersonaliseEditor({
           message,
           font: card.font,
           design: card.design,
-          animation: extras.animation,
-          drawingMediaId,
-          narrationMediaId,
-          clipMediaId,
-          wordTimings,
+          ...(await collectExtras()),
         },
       });
       await api(`/api/proposals/${key}`, { method: 'PATCH', json: { action: 'skip' } }).catch(
@@ -300,6 +324,7 @@ export function PersonaliseEditor({
           onDate={(d) => void onDate(d)}
           onConfirmAddress={() => void confirmAddress()}
           busy={isBusy}
+          onCode={applyCode}
         />
       ) : null}
       <ErrorNote message={error} />

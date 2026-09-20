@@ -1,3 +1,5 @@
+import { parseFloristOrder } from '@/domain';
+
 import type { AiProvider, CompletionArgs, CompletionResult } from './provider';
 
 type Answer = (input: unknown) => unknown;
@@ -83,13 +85,16 @@ const answers: Record<string, Answer> = {
         };
       });
   },
-  read_florist_order: () => ({
-    recipient: 'Mrs J Sharma',
-    relationship: 'mother',
-    occasion: 'birthday',
-    date: null,
-    age: 70,
-  }),
+  read_florist_order: (input) => {
+    const parsed = parseFloristOrder((input as { text: string }).text);
+    return {
+      recipient: parsed.recipient || 'Mrs J Sharma',
+      relationship: parsed.relationship || 'mother',
+      occasion: parsed.occasion || 'birthday',
+      date: parsed.date,
+      age: parsed.age ?? 70,
+    };
+  },
   agent_turn: (input) => {
     const i = input as { message: string; orders: { id: string; person: string; late: boolean }[] };
     const lower = i.message.toLowerCase();

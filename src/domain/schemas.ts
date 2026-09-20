@@ -36,6 +36,18 @@ export const CardSpecSchema = z.object({
     .optional(),
   offerGiant: z.boolean().optional(),
   offerEcard: z.boolean().optional(),
+  /** A validated guarantee code applied to this card (set by the service, never by the client). */
+  guaranteeCode: z.string().max(24).nullable().optional(),
 });
+
+/** Media for a digital card: the eCard, or the 0.29 digital copy of a printed card. */
+export const DigitalExtrasSchema = z.object({
+  animation: z.enum(['envelope', 'flip', 'confetti']).default('envelope'),
+  drawingMediaId: z.string().nullable().default(null),
+  narrationMediaId: z.string().nullable().default(null),
+  clipMediaId: z.string().nullable().default(null),
+  wordTimings: z.array(z.number().nonnegative()).max(400).default([]),
+});
+export type DigitalExtras = z.infer<typeof DigitalExtrasSchema>;
 
 export type CardSpecInput = z.input<typeof CardSpecSchema>;

@@ -46,6 +46,8 @@ export interface CardSpec {
   handwriting?: { mediaId: string; url: string; signatureOnly: boolean } | null;
   offerGiant?: boolean;
   offerEcard?: boolean;
+  /** A validated guarantee code applied by the service (50% off the card price, once). */
+  guaranteeCode?: string | null;
 }
 
 export interface Costs {
@@ -86,6 +88,8 @@ export interface Quote {
   contributionPence: number;
   guarantee: boolean;
   firstCardFree: boolean;
+  /** Pence taken off the card price by a guarantee code. */
+  discountPence: number;
 }
 
 export interface PersonLike {

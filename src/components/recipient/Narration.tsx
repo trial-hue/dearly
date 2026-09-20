@@ -12,11 +12,14 @@ export function Narration({
   audioUrl,
   timings,
   className,
+  enabled = true,
 }: {
   text: string;
   audioUrl: string | null;
   timings: number[];
   className?: string;
+  /** False shows the message only: no recording and no built-in voice. */
+  enabled?: boolean;
 }) {
   const words = useMemo(() => text.split(/\s+/).filter(Boolean), [text]);
   const [shown, setShown] = useState(words.length);
@@ -117,15 +120,21 @@ export function Narration({
         ))}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
-        {audioUrl ? (
+        {enabled && audioUrl ? (
           <>
             <audio ref={audioRef} src={audioUrl} preload="metadata" />
-            <button type="button" className="btn btn-sm" onClick={playAudio} disabled={playing}>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={playAudio}
+              disabled={playing}
+              data-testid="play-narration"
+            >
               {playing ? 'Playing…' : 'Play the narration'}
             </button>
           </>
         ) : null}
-        {canSpeak ? (
+        {enabled && canSpeak ? (
           <button type="button" className="btn btn-sm btn-ghost" onClick={speak} disabled={playing}>
             Read it aloud
           </button>

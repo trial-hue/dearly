@@ -15,7 +15,8 @@ export interface RevealProps {
   name: string;
   age?: number | null;
   message: string;
-  animation: Animation;
+  /** Null renders the card still, with no narration controls (no digital copy was bought). */
+  animation: Animation | null;
   narrationUrl: string | null;
   timings: number[];
   drawingUrl?: string | null;
@@ -52,10 +53,10 @@ export function CardReveal({
 }: RevealProps) {
   const [opened, setOpened] = useState(false);
   useEffect(() => {
-    if (!autoplay) return;
+    if (!autoplay || !animation) return;
     const t = setTimeout(() => setOpened(true), 150);
     return () => clearTimeout(t);
-  }, [autoplay]);
+  }, [autoplay, animation]);
   return (
     <div>
       <div className={`anim-stage relative mx-auto ${width} ${opened ? `anim-${animation}` : ''}`}>
@@ -95,6 +96,7 @@ export function CardReveal({
           audioUrl={narrationUrl}
           timings={timings}
           className={fontClassFor(card.font)}
+          enabled={animation !== null}
         />
         {card.handwriting ? (
           // eslint-disable-next-line @next/next/no-img-element -- handwriting from the app's own storage
@@ -104,7 +106,14 @@ export function CardReveal({
             className={`mt-2 ${card.handwriting.signatureOnly ? 'ml-auto w-1/2' : 'w-full'}`}
           />
         ) : null}
-        {clipUrl ? <video src={clipUrl} controls className="mt-3 w-full rounded" /> : null}
+        {clipUrl ? (
+          <video
+            src={clipUrl}
+            controls
+            className="mt-3 w-full rounded"
+            data-testid="recipient-clip"
+          />
+        ) : null}
       </div>
     </div>
   );

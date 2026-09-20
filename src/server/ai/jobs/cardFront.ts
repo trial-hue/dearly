@@ -16,7 +16,7 @@ export interface CardFrontOutput {
   svg: string | null;
 }
 
-const Output = z.object({ svg: z.string().min(10).max(30_000) });
+const Output = z.object({ svg: z.string().min(10).max(30_000).nullable() });
 
 export const cardFrontJob = defineJob<CardFrontInput, CardFrontOutput>({
   tier: 'default',
@@ -31,7 +31,8 @@ export const cardFrontJob = defineJob<CardFrontInput, CardFrontOutput>({
   },
   schema: Output as unknown as z.ZodType<CardFrontOutput>,
   validate(output) {
-    const clean = sanitiseSvg(output.svg ?? '');
+    if (output.svg == null) return { svg: null }; // the model may decline
+    const clean = sanitiseSvg(output.svg);
     if (!clean) throw new Error('svg rejected by the sanitiser');
     return { svg: clean };
   },

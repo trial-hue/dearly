@@ -67,7 +67,7 @@ export function BusinessWorkbench({ staffText }: { staffText: string }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-      <section className="card">
+      <section className="card min-w-0">
         <label htmlFor="staff-text" className="text-xs font-medium text-ink-2">
           Staff list (name, date, occasion, postcode)
         </label>
@@ -152,7 +152,7 @@ export function BusinessWorkbench({ staffText }: { staffText: string }) {
         <ErrorNote message={error} />
       </section>
 
-      <aside className="card space-y-3">
+      <aside className="card min-w-0 space-y-3">
         <h2 className="font-bold">Options</h2>
         <div role="radiogroup" aria-label="Delivery" className="grid grid-cols-2 gap-2">
           {(['posted', 'officeDrop'] as DeliveryOption[]).map((o) => (

@@ -5,6 +5,7 @@ import {
   FIRST_CARD_FREE,
   GIFTS,
   GIFT_COST_SHARE,
+  GUARANTEE,
   MODES,
   MOONPIG,
   PICKUP,
@@ -34,6 +35,8 @@ export interface QuoteInput {
   gift?: GiftId;
   /** The account's first card: the card price is free; delivery, digital copy and gifts are charged. */
   firstCardFree?: boolean;
+  /** A guarantee code from a missed delivery: 50% off the card price only, once. */
+  nextCardDiscount?: boolean;
 }
 
 export function giftPrice(gift: GiftId | undefined): number {
@@ -97,6 +100,7 @@ export function quote(card: QuoteInput, costs: Costs = DEFAULT_COSTS): Quote {
       contributionPence: roundPence(exVat - costExact),
       guarantee: false,
       firstCardFree: false,
+      discountPence: 0,
     };
   }
 
@@ -110,7 +114,11 @@ export function quote(card: QuoteInput, costs: Costs = DEFAULT_COSTS): Quote {
   const listPence = toPence(PRICE[card.size][card.finish]);
   const firstCardFree =
     Boolean(card.firstCardFree) && firstCardFreeApplies(card.size, card.finish, card.mode);
-  const cardPence = firstCardFree ? 0 : listPence;
+  const discountPence =
+    card.nextCardDiscount && !firstCardFree
+      ? roundPence(listPence * GUARANTEE.nextCardDiscountPct)
+      : 0;
+  const cardPence = firstCardFree ? 0 : listPence - discountPence;
   const deliveryPence = toPence(deliveryPounds);
   const digitalPence = card.digital ? toPence(DIGITAL.paired) : 0;
   const giftPence = toPence(giftPrice(card.gift));
@@ -120,6 +128,11 @@ export function quote(card: QuoteInput, costs: Costs = DEFAULT_COSTS): Quote {
     pence: listPence,
   });
   if (firstCardFree) lines.push({ label: 'First card free', pence: -listPence });
+  if (discountPence)
+    lines.push({
+      label: `${Math.round(GUARANTEE.nextCardDiscountPct * 100)}% off the card price (guarantee code)`,
+      pence: -discountPence,
+    });
   lines.push({
     label:
       card.mode === 'pickup' ? 'Pick-up at a partner shop, ready today' : MODES[card.mode].label,
@@ -188,6 +201,7 @@ export function quote(card: QuoteInput, costs: Costs = DEFAULT_COSTS): Quote {
     contributionPence: roundPence(exVat - costExact),
     guarantee,
     firstCardFree,
+    discountPence,
   };
 }
 

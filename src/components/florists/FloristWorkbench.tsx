@@ -86,12 +86,14 @@ export function FloristWorkbench({ sample }: { sample: string }) {
                   await api('/api/partners/referral', {
                     json: { reading: reading.reading, readBy: reading.by },
                   });
-                  toast('Reminder set for next year and the free first card claimed');
+                  toast(
+                    'Reminder set for next year; the first Regular card is free once three dates are saved',
+                  );
                   setReading(null);
                 })
               }
             >
-              Add reminder and claim the free first card
+              Add reminder and claim the first-card offer
             </button>
           </>
         ) : (

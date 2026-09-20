@@ -137,7 +137,13 @@ export async function seedDemo(prisma: PrismaClient, opts: SeedOptions = {}): Pr
     await prisma.job.deleteMany({});
     await prisma.referral.deleteMany({});
     await prisma.account.deleteMany({
-      where: { OR: [{ id: DEMO_ACCOUNT_ID }, { email: { endsWith: '@referral.dearly.invalid' } }] },
+      where: {
+        OR: [
+          { id: DEMO_ACCOUNT_ID },
+          { email: { endsWith: '@referral.dearly.invalid' } },
+          { email: { endsWith: '@recipient.dearly.invalid' } },
+        ],
+      },
     });
     await prisma.organisation.deleteMany({ where: { id: DEMO_ORG_ID } });
     await prisma.setting.deleteMany({});

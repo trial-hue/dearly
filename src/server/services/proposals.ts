@@ -2,8 +2,10 @@ import type { Person, Proposal } from '@prisma/client';
 
 import {
   CardSpecSchema,
+  RULES,
   TITLES,
   addDays,
+  addYears,
   addressIsStale,
   allowedModes,
   arrivalDate,
@@ -27,6 +29,7 @@ import {
   yearsAt,
   type CardSpec,
   type Costs,
+  type DigitalExtras,
   type OccasionType,
   type ProposalBucket,
   type Quote,
@@ -37,6 +40,7 @@ import { newSlug } from '@/server/ids';
 import { json } from '@/server/json';
 
 import * as decisions from './decisionLog';
+import { mediaUrl } from './media';
 import { toOccasionLike } from './people';
 import { getSettings } from './settings';
 
@@ -123,7 +127,7 @@ export function toView(
     daysLeft,
     age: null,
     card,
-    quote: quote({ ...card, firstCardFree }, costs),
+    quote: quote({ ...card, firstCardFree, nextCardDiscount: Boolean(card.guaranteeCode) }, costs),
     arrival: arrivalDate(card.mode, card.size, dueDate, today),
     bucket: bucketFor(daysLeft),
     madeBy: row.madeBy,
@@ -356,6 +360,7 @@ export async function approveProposal(
   key: string,
   accountId: string,
   today: Date,
+  extras?: DigitalExtras,
 ): Promise<ApproveResult> {
   const row = await prisma.proposal.findUnique({ where: { key }, include: { person: true } });
   if (!row || row.person.accountId !== accountId) return { ok: false, reason: 'not_found' };
@@ -366,7 +371,13 @@ export async function approveProposal(
   if (!check.ok) return { ok: false, reason: check.reason };
 
   const { costs } = await getSettings();
-  const q = quote({ ...card, firstCardFree: await firstCardFreeFor(accountId) }, costs);
+  // A guarantee code is honoured only while it is still unused (single use).
+  const code = card.guaranteeCode ? await findGuaranteeCode(card.guaranteeCode, accountId) : null;
+  if (card.guaranteeCode && !code) card.guaranteeCode = null;
+  const q = quote(
+    { ...card, firstCardFree: await firstCardFreeFor(accountId), nextCardDiscount: Boolean(code) },
+    costs,
+  );
   const type = keyType(row.key);
   const dueDate = startOfDay(row.dueDate);
   const promised = arrivalDate(card.mode, card.size, dueDate, today);
@@ -380,6 +391,19 @@ export async function approveProposal(
   const payment = await payments.capture(auth.authId, q.totalPence);
   const slug = newSlug();
   const now = new Date();
+  // The paid digital copy of a printed card is a digital card with the same extras as an eCard.
+  const digitalCopy =
+    card.mode !== 'ecard' && card.digital
+      ? {
+          slug,
+          animation: extras?.animation ?? 'envelope',
+          narrationUrl: await mediaUrl(extras?.narrationMediaId ?? null),
+          clipUrl: await mediaUrl(extras?.clipMediaId ?? null),
+          drawingUrl: await mediaUrl(extras?.drawingMediaId ?? null),
+          wordTimings: json(extras?.wordTimings ?? []),
+          expiresAt: addYears(now, RULES.inventoryYears),
+        }
+      : null;
 
   const order = await prisma.order.create({
     data: {
@@ -402,6 +426,7 @@ export async function approveProposal(
       printerId: printer?.id ?? null,
       recipientSlug: slug,
       ...(printer ? { shipments: { create: { printerId: printer.id, kind: 'first' } } } : {}),
+      ...(digitalCopy ? { digitalCard: { create: digitalCopy } } : {}),
       ...(card.mode === 'ecard'
         ? {
             digitalCard: { create: { slug, animation: 'envelope' } },
@@ -424,6 +449,7 @@ export async function approveProposal(
     },
   });
   await prisma.proposal.update({ where: { key }, data: { status: 'approved' } });
+  if (code) await markGuaranteeCodeUsed(code.recoveryId, code.code, order.id);
 
   const modeLabel =
     card.mode === 'ecard'
@@ -639,4 +665,76 @@ export async function applyAiProposal(
     where: { key },
     data: { cardSpec: json(next), madeBy: 'ai', messageBy: 'ai', aiReason: patch.reason },
   });
+}
+
+/** A guarantee code as issued by a recovery: the action detail carries "code DEARLY50-XXXX". */
+interface IssuedCode {
+  recoveryId: string;
+  code: string;
+  used: boolean;
+}
+
+async function issuedCodes(accountId: string): Promise<IssuedCode[]> {
+  const rows = await prisma.recovery.findMany({ where: { order: { accountId } } });
+  const out: IssuedCode[] = [];
+  for (const r of rows) {
+    const actions = Array.isArray(r.actions) ? (r.actions as Record<string, unknown>[]) : [];
+    for (const a of actions) {
+      if (a.type !== 'discount') continue;
+      const m = /code\s+([A-Z0-9-]+)/i.exec(String(a.detail ?? ''));
+      if (m)
+        out.push({ recoveryId: r.id, code: (m[1] as string).toUpperCase(), used: a.used === true });
+    }
+  }
+  return out;
+}
+
+/** The unused issued code matching `code`, or null. */
+async function findGuaranteeCode(code: string, accountId: string): Promise<IssuedCode | null> {
+  const wanted = code.trim().toUpperCase();
+  return (await issuedCodes(accountId)).find((c) => c.code === wanted && !c.used) ?? null;
+}
+
+async function markGuaranteeCodeUsed(recoveryId: string, code: string, orderId: string) {
+  const r = await prisma.recovery.findUniqueOrThrow({ where: { id: recoveryId } });
+  const actions = (r.actions as Record<string, unknown>[]).map((a) =>
+    a.type === 'discount' &&
+    String(a.detail ?? '')
+      .toUpperCase()
+      .includes(code)
+      ? { ...a, used: true, usedOrderId: orderId }
+      : a,
+  );
+  await prisma.recovery.update({ where: { id: recoveryId }, data: { actions: json(actions) } });
+  await decisions.record({
+    actor: 'rule',
+    job: 'recovery',
+    summary: `Guarantee code ${code} redeemed: 50% off the card price, delivery charged`,
+    orderId,
+  });
+}
+
+/**
+ * Apply a guarantee code to an open proposal: the card price halves, delivery and extras stay.
+ * Throws with a customer-readable message when the code is unknown or already used.
+ */
+export async function applyGuaranteeCode(
+  key: string,
+  code: string,
+  accountId: string,
+  today: Date,
+): Promise<ProposalView | null> {
+  const row = await prisma.proposal.findUnique({ where: { key }, include: { person: true } });
+  if (!row || row.person.accountId !== accountId) return null;
+  const wanted = code.trim().toUpperCase();
+  const all = await issuedCodes(accountId);
+  const match = all.find((c) => c.code === wanted);
+  if (!match) throw new Error('That code is not one of ours. Check the letters and try again.');
+  if (match.used) throw new Error('That code has already been used. Each code works once.');
+  const card = parseCard(row.cardSpec);
+  await prisma.proposal.update({
+    where: { key },
+    data: { cardSpec: json({ ...card, guaranteeCode: wanted }) },
+  });
+  return getProposal(key, today);
 }

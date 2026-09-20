@@ -18,6 +18,7 @@ import {
   FLORIST,
   GIFTS,
   GIFT_COST_SHARE,
+  GUARANTEE,
   MODES,
   MOONPIG,
   PICKUP,
@@ -200,7 +201,7 @@ line();
 line('## 10. Guarantee');
 line();
 line(
-  'Advance and tracked only. A missed date gives a full refund and a single-use code for 50% off the card price (not delivery) of the next order, a tracked reprint when two or more days remain, and an on-the-day eCard always.',
+  `Advance and tracked only. A missed date gives a full refund and a single-use code for ${Math.round(GUARANTEE.nextCardDiscountPct * 100)}% off the card price (not delivery) of the next order, a tracked reprint when two or more days remain, and an on-the-day eCard always.`,
 );
 line();
 

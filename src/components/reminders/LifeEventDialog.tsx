@@ -20,6 +20,16 @@ export function LifeEventDialog() {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
   const [result, setResult] = useState<Result | null>(null);
+  const [applied, setApplied] = useState(false);
+  const confirmPause = () =>
+    run('pause', async () => {
+      if (!result?.result.personId) return;
+      await api('/api/people', {
+        method: 'PATCH',
+        json: { action: 'pause', id: result.result.personId, reason: result.result.reason },
+      });
+      setApplied(true);
+    });
   return (
     <>
       <button type="button" className="btn" onClick={() => setOpen(true)} data-testid="life-open">
@@ -52,9 +62,10 @@ export function LifeEventDialog() {
             disabled={busy !== null || !text.trim()}
             data-testid="life-event-check"
             onClick={() =>
-              run('life', async () =>
-                setResult(await api('/api/ai/life_event', { json: { text } })),
-              )
+              run('life', async () => {
+                setApplied(false);
+                setResult(await api('/api/ai/life_event', { json: { text } }));
+              })
             }
           >
             {busy === 'life' ? 'Reading…' : 'Let Dearly know'}
@@ -68,13 +79,24 @@ export function LifeEventDialog() {
             <p className="font-semibold">{result.personName ?? 'No one matched'}</p>
             <p className="mt-1 text-ink-2">
               {result.result.action === 'pause'
-                ? result.applied
+                ? applied
                   ? `We have paused cards for ${result.personName}. Nothing will be sent until you say so. We are sorry.`
                   : result.alreadyPaused
                     ? `${result.personName}'s cards were already paused, so nothing changed.`
-                    : 'No change was made.'
+                    : `Pause cards for ${result.personName}? Nothing changes until you confirm.`
                 : `Nothing to pause: ${result.result.reason.toLowerCase()}.`}
             </p>
+            {result.result.action === 'pause' && !applied && !result.alreadyPaused ? (
+              <button
+                type="button"
+                className="btn btn-primary btn-sm mt-2"
+                disabled={busy !== null}
+                data-testid="life-confirm"
+                onClick={confirmPause}
+              >
+                {busy === 'pause' ? 'Pausing…' : `Yes, pause cards for ${result.personName}`}
+              </button>
+            ) : null}
           </div>
         ) : null}
         <ErrorNote message={error} />

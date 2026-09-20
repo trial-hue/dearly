@@ -1,5 +1,5 @@
 import { daysBetween, isoDate, startOfDay } from './calendar';
-import { MODES, PRINT_COST } from './constants';
+import { GUARANTEE, MODES, PRINT_COST } from './constants';
 import { toPence } from './money';
 import type { OrderForRecovery, RecoveryAction } from './types';
 
@@ -32,7 +32,7 @@ export function planRecovery(
   }
   actions.push({
     type: 'discount',
-    label: '50% off the card price of the next order',
+    label: `${Math.round(GUARANTEE.nextCardDiscountPct * 100)}% off the card price of the next order`,
     pence: 0,
     detail: `Single-use code DEARLY50-${order.id.slice(-4).toUpperCase()}, delivery not included`,
   });

@@ -18,6 +18,7 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'retain-on-failure',
+    permissions: ['microphone', 'camera'],
     launchOptions: {
       args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'],
     },

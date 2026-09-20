@@ -26,6 +26,23 @@ export type CleanStaffOutput = StaffRow[];
 
 const OCCASIONS = ['birthday', 'work_anniversary', 'leaving'];
 
+const POSTCODE_ANYWHERE = /\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/gi;
+
+/** Replace every postcode with a token (PC1, PC2, ...) so the model never sees one. */
+export function maskPostcodes(text: string): { masked: string; postcodes: string[] } {
+  const postcodes: string[] = [];
+  const masked = text.replace(POSTCODE_ANYWHERE, (m) => {
+    postcodes.push(m);
+    return `PC${postcodes.length}`;
+  });
+  return { masked, postcodes };
+}
+
+function unmaskPostcode(value: string, postcodes: string[]): string {
+  const m = /^PC(\d+)$/i.exec(value.trim());
+  return m ? (postcodes[Number(m[1]) - 1] ?? '') : value;
+}
+
 /** Convert the AI's shape into the domain's StaffRow so both paths render the same table. */
 function toStaffRow(item: z.infer<typeof Item>, raw: string): StaffRow {
   const iso =
@@ -64,10 +81,10 @@ export const cleanStaffListJob = defineJob<CleanStaffInput, CleanStaffOutput>({
   buildPrompt(input) {
     return [
       `${PROMPT_HEAD} Clean a pasted staff list for a business account: one row per line as "name, date, occasion, postcode".`,
-      `${RULES_LINE} Dates are day before month; output ISO "YYYY-MM-DD" when the year is known, else "MM-DD". Flag a duplicate name, an impossible date, or a missing or malformed UK postcode in "issue"; otherwise issue is null. Do not invent postcodes or dates.`,
+      `${RULES_LINE} Dates are day before month; output ISO "YYYY-MM-DD" when the year is known, else "MM-DD". Postcodes have been replaced by tokens such as PC1; copy the token into "postcode" unchanged, or "" when the row has none. Flag a duplicate name, an impossible date, or a missing postcode token in "issue"; otherwise issue is null. Do not invent dates.`,
       `Allowed values: occasion in ${JSON.stringify(OCCASIONS)}.`,
-      `Data: ${JSON.stringify(input.text.slice(0, 6000))}`,
-      'Reply with only JSON in this shape: [{"name": string, "date": string|null, "occasion": string, "postcode": string, "issue": string|null}]. Example: [{"name":"Aisha Khan","date":"1991-03-14","occasion":"birthday","postcode":"M4 5JH","issue":null}]',
+      `Data: ${JSON.stringify(maskPostcodes(input.text.slice(0, 6000)).masked)}`,
+      'Reply with only JSON in this shape: [{"name": string, "date": string|null, "occasion": string, "postcode": string, "issue": string|null}]. Example: [{"name":"Aisha Khan","date":"1991-03-14","occasion":"birthday","postcode":"PC1","issue":null}]',
     ].join('\n');
   },
   schema: Output as unknown as z.ZodType<CleanStaffOutput>,
@@ -78,7 +95,10 @@ export const cleanStaffListJob = defineJob<CleanStaffInput, CleanStaffOutput>({
       .filter(Boolean);
     const items = output as unknown as z.infer<typeof Item>[];
     if (items.length === 0) throw new Error('empty staff list');
-    return items.map((item, i) => toStaffRow(item, lines[i] ?? ''));
+    const { postcodes } = maskPostcodes(input.text.slice(0, 6000));
+    return items.map((item, i) =>
+      toStaffRow({ ...item, postcode: unmaskPostcode(item.postcode, postcodes) }, lines[i] ?? ''),
+    );
   },
   fallback(input) {
     return cleanStaffList(input.text);

@@ -5,30 +5,15 @@ import Link from 'next/link';
 import { CardMock } from '@/components/card/CardMock';
 import { useToast } from '@/components/shell/Toast';
 import { ErrorNote } from '@/components/ui';
-import { PICKUP_PROMISE, ordinal } from '@/domain';
+import { PICKUP_PROMISE } from '@/domain';
 import { api, useAction } from '@/lib/fetcher';
 import { daysLabel, fmtDate, formatPence } from '@/lib/format';
-import { OCCASION_LABELS } from '@/lib/occasions';
 import type { Serialized } from '@/lib/serialize';
 import type { ProposalView } from '@/server/services/proposals';
 
-export type ProposalDTO = Serialized<ProposalView>;
+import { reminderHeadline } from './headline';
 
-export function reminderHeadline(p: Pick<ProposalDTO, 'person' | 'occasionType' | 'age'>): string {
-  const first = p.person.name.includes(' and ')
-    ? p.person.name
-    : (p.person.name.split(' ')[0] ?? p.person.name);
-  const who = first.endsWith('s') ? `${first}'` : `${first}'s`;
-  if (p.occasionType === 'birthday')
-    return `${who} ${p.age != null ? `${ordinal(p.age)} ` : ''}birthday`;
-  if (p.occasionType === 'anniversary')
-    return `${who} ${p.age != null ? `${ordinal(p.age)} ` : ''}anniversary`;
-  if (p.occasionType === 'leaving') return `${who} leaving card`;
-  if (p.occasionType === 'thank_you') return `A thank you for ${first}`;
-  if (p.occasionType === 'work_anniversary')
-    return `${who} ${p.age != null ? `${ordinal(p.age)} ` : ''}work anniversary`;
-  return `${OCCASION_LABELS[p.occasionType]} for ${first}`;
-}
+export type ProposalDTO = Serialized<ProposalView>;
 
 /** One reminder: the card, what it is, when, the drafted line, the price and three actions. */
 export function ReminderCard({
@@ -44,7 +29,7 @@ export function ReminderCard({
   const key = encodeURIComponent(p.key);
   return (
     <article
-      className={`tile flex ${compact ? 'w-[300px] flex-col' : 'flex-col sm:flex-row'} gap-4 p-4`}
+      className={`tile flex min-w-0 ${compact ? 'w-[300px] flex-col' : 'flex-col sm:flex-row'} gap-4 p-4`}
       data-testid={`reminder-${p.person.id}`}
       aria-labelledby={`r-${p.id}`}
     >
@@ -94,7 +79,9 @@ export function ReminderCard({
           </p>
         ) : null}
         <div className="mt-auto flex flex-wrap items-center gap-2 pt-3">
-          <span className="t-price mr-1">{formatPence(p.quote.totalPence)}</span>
+          <span className="t-price mr-1" data-testid="reminder-total">
+            {formatPence(p.quote.totalPence)}
+          </span>
           <button
             type="button"
             className="btn btn-primary btn-sm"

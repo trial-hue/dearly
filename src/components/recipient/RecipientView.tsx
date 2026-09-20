@@ -35,7 +35,8 @@ export function RecipientView({
   const [saved, setSaved] = useState(false);
   const [sentBack, setSentBack] = useState(false);
   const first = o.recipientName.split(' ')[0] ?? o.recipientName;
-  const animation = ((digital?.animation as Animation) ?? 'envelope') as Animation;
+  // Animation, narration and clip belong to the digital card: an eCard or the paid digital copy.
+  const animation = digital ? ((digital.animation as Animation) ?? 'envelope') : null;
   const timings = Array.isArray(digital?.wordTimings) ? (digital?.wordTimings as number[]) : [];
   return (
     <div className="mx-auto max-w-md" data-testid="recipient-view">

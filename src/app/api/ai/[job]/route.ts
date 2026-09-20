@@ -11,7 +11,7 @@ import { ok, problem, readJson } from '@/server/http';
 import { json } from '@/server/json';
 import { rateLimit } from '@/server/rateLimit';
 import { saveStaffText } from '@/server/services/business';
-import { listPeople, pausePerson } from '@/server/services/people';
+import { listPeople } from '@/server/services/people';
 import {
   SENDER,
   applyAiProposal,
@@ -92,18 +92,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ job: st
         text: body.data.text,
         people: people.map((p) => ({ id: p.id, name: p.name, relationship: p.relationship })),
       });
+      // The reading is a proposal: nothing changes until the customer confirms the pause
+      // (PATCH /api/people with action "pause").
       const person = people.find((p) => p.id === r.result.personId) ?? null;
-      let applied = false;
-      if (r.result.action === 'pause' && person && !person.pausedReason) {
-        await pausePerson(person.id, r.result.reason, r.by, today);
-        applied = true;
-      }
       return ok({
         result: r.result,
         by: r.by,
         personName: person?.name ?? null,
         alreadyPaused: Boolean(person?.pausedReason),
-        applied,
+        applied: false,
         note: r.note,
       });
     }
