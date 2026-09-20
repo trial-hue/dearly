@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: dearly
+      POSTGRES_PASSWORD: dearly
+      POSTGRES_DB: dearly
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U dearly -d dearly']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    ports:
+      - '5432:5432'
+
+  app:
+    build: .
+    command: ['web']
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://dearly:dearly@postgres:5432/dearly
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      STORAGE_PATH: /app/.data/uploads
+    volumes:
+      - uploads:/app/.data/uploads
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  worker:
+    build: .
+    command: ['worker']
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://dearly:dearly@postgres:5432/dearly
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      STORAGE_PATH: /app/.data/uploads
+    volumes:
+      - uploads:/app/.data/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  seed:
+    build: .
+    command: ['seed']
+    profiles: ['seed']
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://dearly:dearly@postgres:5432/dearly
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  uploads:
