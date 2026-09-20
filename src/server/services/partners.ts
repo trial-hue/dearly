@@ -1,6 +1,7 @@
 import {
   FLORIST_REFERRAL_FEE_PENCE,
   expectedCommissionPence,
+  formatPence,
   parseIsoDate,
   type FloristReading,
 } from '@/domain';
@@ -83,7 +84,7 @@ export async function createReferral(reading: FloristReading, readBy: 'ai' | 'ru
     {
       actor: 'rule',
       job: 'referral',
-      summary: `Reminder set for ${customer}: ${reading.recipient}'s ${reading.occasion}${ledger.nextDate ? ` on ${ledger.nextDate}` : ''}, free first card; £1.50 owed to ${partner.name}; £${(ledger.expectedCommissionPence / 100).toFixed(2)} commission expected next year`,
+      summary: `Reminder set for ${customer}: ${reading.recipient}'s ${reading.occasion}${ledger.nextDate ? ` on ${ledger.nextDate}` : ''}, free first card; ${formatPence(ledger.referralFeePence)} owed to ${partner.name}; ${formatPence(ledger.expectedCommissionPence)} commission expected next year`,
     },
   ]);
   return referral;

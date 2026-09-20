@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { BUSINESS, formatPence, toPence } from '@/domain';
 import type { TITLES } from '@/domain';
 import { OCCASION_LABELS, OCCASION_SLUGS } from '@/lib/occasions';
 
@@ -77,8 +78,8 @@ export function Footer({ aiMode, aiLabel }: { aiMode: 'ai' | 'rules'; aiLabel: s
         <div>
           <h2 className="mb-2 text-sm font-bold">Dearly for Business</h2>
           <p className="text-sm text-ink-2">
-            Birthday, work anniversary and leaving cards for your whole team, on time, from £2.30 a
-            card.
+            Birthday, work anniversary and leaving cards for your whole team, on time, from{' '}
+            {formatPence(toPence(BUSINESS.officeDrop))} a card excluding VAT.
           </p>
           <Link
             href="/business"

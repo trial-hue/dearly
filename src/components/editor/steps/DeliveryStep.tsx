@@ -2,7 +2,16 @@
 
 import { GuaranteeBadge } from '@/components/store/GuaranteeBadge';
 import { Field } from '@/components/ui';
-import { MODES, SIZES, allowedModes, arrivalDate, type CardSpec, type PrintedMode } from '@/domain';
+import {
+  MODES,
+  PICKUP_PROMISE,
+  SIZES,
+  allowedModes,
+  arrivalDate,
+  toPence,
+  type CardSpec,
+  type PrintedMode,
+} from '@/domain';
 import { fmtDate, formatPence } from '@/lib/format';
 
 export function DeliveryStep({
@@ -23,7 +32,7 @@ export function DeliveryStep({
   busy: boolean;
 }) {
   const ecard = card.mode === 'ecard';
-  const modes = allowedModes(card.size);
+  const modes = allowedModes(card.size, card.finish);
   const first = person.name.split(' ')[0];
   const todayIso = new Date().toISOString().slice(0, 10);
   return (
@@ -70,13 +79,12 @@ export function DeliveryStep({
                 >
                   <span className="flex flex-col">
                     <span className="font-bold">{MODES[m].label}</span>
-                    <span className="text-xs text-ink-2">
-                      {MODES[m].desc}. Arrives {fmtDate(arrives)}.
+                    <span className="text-xs text-ink-2" data-testid={`mode-${m}-promise`}>
+                      {MODES[m].desc}.{' '}
+                      {m === 'pickup' ? `${PICKUP_PROMISE}.` : `Arrives ${fmtDate(arrives)}.`}
                     </span>
                   </span>
-                  <span className="t-price text-sm">
-                    {price ? formatPence(Math.round(price * 100)) : 'Free'}
-                  </span>
+                  <span className="t-price text-sm">{formatPence(toPence(price))}</span>
                 </button>
               );
             })}
@@ -107,7 +115,13 @@ export function DeliveryStep({
               <p className="mt-1 text-ink-2">Checked within the year.</p>
             )}
           </div>
-          <GuaranteeBadge />
+          {MODES[card.mode].guarantee ? (
+            <GuaranteeBadge />
+          ) : (
+            <p className="text-xs text-ink-2" data-testid="no-guarantee">
+              Pick-up has no delivery guarantee: it is ready for them to collect today.
+            </p>
+          )}
         </>
       )}
     </div>

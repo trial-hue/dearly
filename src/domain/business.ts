@@ -8,9 +8,11 @@ import {
   startOfDay,
 } from './calendar';
 import { BUSINESS, BUSINESS_COSTS, DEFAULT_COSTS, MODES, PRICE, PRINT_COST } from './constants';
-import { toPence } from './money';
+import { roundPence, toPence } from './money';
 import { isValidPostcode, normalisePostcode } from './routing';
-import type { Costs, Finish } from './types';
+import type { Costs } from './types';
+
+export type BusinessFinish = (typeof BUSINESS.finishes)[number];
 
 export type StaffOccasion = 'birthday' | 'work_anniversary' | 'leaving';
 export type DeliveryOption = 'posted' | 'officeDrop';
@@ -130,46 +132,70 @@ export interface BatchPricing {
   totalPence: number;
   costPence: number;
   contributionPence: number;
+  contributionPerCardPence: number;
 }
 
 export interface BatchOptions {
   option: DeliveryOption;
-  finish: Finish;
+  finish: BusinessFinish;
   annualCards: number;
   automate: boolean;
   giantCards?: number;
   costs?: Costs;
 }
 
-/** Price and contribution of one batch, ex VAT, in pence. */
+/** Per-card cost to Dearly of a business card, ex VAT, exact pence: print, delivery, AI, service, guarantee reserve. */
+export function businessUnitCostExact(
+  option: DeliveryOption,
+  finish: BusinessFinish,
+  costs: Costs = DEFAULT_COSTS,
+): number {
+  const delivery =
+    option === 'posted'
+      ? toPence(MODES.advance.cost.regular)
+      : toPence(BUSINESS_COSTS.officeDropDelivery);
+  return (
+    toPence(PRINT_COST.regular[finish]) +
+    delivery +
+    toPence(costs.ai) +
+    toPence(costs.service) +
+    toPence(costs.guarantee)
+  );
+}
+
+/** Contribution of one business card at a unit price, ex VAT: price minus costs minus 1% payment on the price. */
+export function businessUnitContributionPence(
+  unitPence: number,
+  option: DeliveryOption,
+  finish: BusinessFinish = 'signature',
+  costs: Costs = DEFAULT_COSTS,
+): number {
+  return roundPence(
+    unitPence - businessUnitCostExact(option, finish, costs) - BUSINESS.paymentPct * unitPence,
+  );
+}
+
+/** Price and contribution of one batch, ex VAT, in pence. Payment is 1% of the invoice. */
 export function priceBatch(cards: number, opts: BatchOptions): BatchPricing {
   const costs = opts.costs ?? DEFAULT_COSTS;
   const giantCards = Math.min(opts.giantCards ?? 0, cards);
   const regularCards = cards - giantCards;
   const unitPence = businessUnitPricePence(opts.annualCards, opts.option);
   const freeCards = opts.automate ? Math.min(BUSINESS.freeCards, regularCards) : 0;
-  const giantUnitPence = Math.round(
+  const giantUnitPence = roundPence(
     (toPence(PRICE.giant.signature) + toPence(MODES.tracked.price.giant)) / 1.2,
   );
   const totalPence = (regularCards - freeCards) * unitPence + giantCards * giantUnitPence;
 
-  const deliveryCost =
-    opts.option === 'posted'
-      ? toPence(MODES.advance.cost.regular)
-      : toPence(BUSINESS_COSTS.officeDropDelivery);
-  const perCardCost =
-    toPence(PRINT_COST.regular[opts.finish]) +
-    deliveryCost +
-    toPence(costs.ai) +
-    toPence(costs.service);
+  const perCardCost = businessUnitCostExact(opts.option, opts.finish, costs);
   const perGiantCost =
     toPence(PRINT_COST.giant.signature) +
     toPence(MODES.tracked.cost.giant) +
     toPence(costs.ai) +
-    toPence(costs.service);
-  const paymentPence =
-    Math.round(costs.payPct * totalPence) + (cards > 0 ? toPence(costs.payFixed) : 0);
-  const costPence = regularCards * perCardCost + giantCards * perGiantCost + paymentPence;
+    toPence(costs.service) +
+    toPence(costs.guarantee);
+  const paymentExact = BUSINESS.paymentPct * totalPence;
+  const costExact = regularCards * perCardCost + giantCards * perGiantCost + paymentExact;
   return {
     cards,
     unitPence,
@@ -177,8 +203,9 @@ export function priceBatch(cards: number, opts: BatchOptions): BatchPricing {
     giantUnitPence,
     freeCards,
     totalPence,
-    costPence,
-    contributionPence: totalPence - costPence,
+    costPence: roundPence(costExact),
+    contributionPence: roundPence(totalPence - costExact),
+    contributionPerCardPence: cards > 0 ? roundPence((totalPence - costExact) / cards) : 0,
   };
 }
 
@@ -205,7 +232,7 @@ export function annualCalculator(input: AnnualCalculator): AnnualResult {
   const office = input.cardsPerYear - posted;
   const unitPostedPence = businessUnitPricePence(input.cardsPerYear, 'posted');
   const subscriptionPence = input.automate ? toPence(BUSINESS.automateMonthly) * 12 : 0;
-  const includedCards = input.automate ? Math.min(BUSINESS.freeCards * 12, posted) : 0;
+  const includedCards = input.automate ? Math.min(BUSINESS.freeCards, posted) : 0;
   const dearlyPence =
     subscriptionPence +
     (posted - includedCards) * unitPostedPence +

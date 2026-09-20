@@ -11,8 +11,8 @@ import {
   schedulable,
   sendDateFor,
   staffRowsSummary,
+  type BusinessFinish,
   type DeliveryOption,
-  type Finish,
   type StaffRow,
 } from '@/domain';
 import { api, useAction } from '@/lib/fetcher';
@@ -25,7 +25,7 @@ export function BusinessWorkbench({ staffText }: { staffText: string }) {
   const [rows, setRows] = useState<StaffRow[] | null>(null);
   const [by, setBy] = useState<'ai' | 'rule'>('rule');
   const [option, setOption] = useState<DeliveryOption>('posted');
-  const [finish, setFinish] = useState<Finish>('signature');
+  const [finish, setFinish] = useState<BusinessFinish>('signature');
   const [template, setTemplate] = useState(
     'Happy birthday, {first_name}. Have a brilliant day, from all of us at the studio.',
   );
@@ -180,9 +180,9 @@ export function BusinessWorkbench({ staffText }: { staffText: string }) {
             id="biz-finish"
             className="input"
             value={finish}
-            onChange={(e) => setFinish(e.target.value as Finish)}
+            onChange={(e) => setFinish(e.target.value as BusinessFinish)}
           >
-            {(Object.keys(FINISHES) as Finish[]).map((f) => (
+            {BUSINESS.finishes.map((f) => (
               <option key={f} value={f}>
                 {FINISHES[f].label}
               </option>

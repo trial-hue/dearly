@@ -17,7 +17,7 @@ test.describe('recovery', () => {
     await expect(recovery).toBeVisible();
     await expect(recovery).toContainText('On-the-day eCard');
     await expect(recovery).toContainText('Full refund');
-    await expect(recovery).toContainText('50% off the next card');
+    await expect(recovery).toContainText('50% off the card price of the next order');
     await expect(recovery).toContainText('Tracked reprint');
     await page.goto('/hq/operations');
     const decisions = page.getByTestId('decisions');

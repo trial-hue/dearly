@@ -5,8 +5,8 @@ import {
   schedulable,
   sendDateFor,
   staffRowsSummary,
+  type BusinessFinish,
   type DeliveryOption,
-  type Finish,
   type StaffRow,
 } from '@/domain';
 import { prisma } from '@/server/db';
@@ -31,7 +31,7 @@ export async function saveStaffText(text: string) {
 
 export interface ScheduleInput {
   option: DeliveryOption;
-  finish: Finish;
+  finish: BusinessFinish;
   automate: boolean;
   giantForLeavers: boolean;
   rows: StaffRow[];

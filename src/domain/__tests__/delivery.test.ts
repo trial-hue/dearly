@@ -17,8 +17,8 @@ describe('chooseMode', () => {
   it('tracks a Large card with one day left', () => {
     expect(chooseMode('large', 1)).toBe('tracked');
   });
-  it('follows the day thresholds for Regular cards', () => {
-    expect([0, 1, 2, 6, 7, 30].map((d) => chooseMode('regular', d))).toEqual([
+  it('follows the day thresholds for Regular Signature cards', () => {
+    expect([0, 1, 2, 6, 7, 30].map((d) => chooseMode('regular', d, 'signature'))).toEqual([
       'pickup',
       'pickup',
       'tracked',
@@ -27,13 +27,20 @@ describe('chooseMode', () => {
       'advance',
     ]);
   });
+  it('falls back to tracked for Regular Luxe under two days', () => {
+    expect(chooseMode('regular', 0, 'luxe')).toBe('tracked');
+    expect(chooseMode('regular', 1, 'luxe')).toBe('tracked');
+    expect(chooseMode('regular', 1, 'classic')).toBe('pickup');
+  });
 });
 
 describe('allowedModes', () => {
-  it('allows tracked only for Giant and pick-up only for Regular', () => {
-    expect(allowedModes('giant')).toEqual(['tracked']);
-    expect(allowedModes('regular')).toEqual(['advance', 'tracked', 'pickup']);
-    expect(allowedModes('large')).toEqual(['advance', 'tracked']);
+  it('allows tracked only for Giant and pick-up only for Regular Classic or Signature', () => {
+    expect(allowedModes('giant', 'signature')).toEqual(['tracked']);
+    expect(allowedModes('regular', 'signature')).toEqual(['advance', 'tracked', 'pickup']);
+    expect(allowedModes('regular', 'classic')).toEqual(['advance', 'tracked', 'pickup']);
+    expect(allowedModes('regular', 'luxe')).toEqual(['advance', 'tracked']);
+    expect(allowedModes('large', 'classic')).toEqual(['advance', 'tracked']);
   });
 });
 
@@ -49,9 +56,11 @@ describe('arrivalDate and stages', () => {
     expect(arrivalDate('pickup', 'regular', occ, today)).toEqual(today);
     expect(arrivalDate('ecard', 'regular', occ, today)).toEqual(today);
   });
-  it('offers an eCard alongside a large card with under two days', () => {
-    expect(offerEcardAlongside('large', 1)).toBe(true);
-    expect(offerEcardAlongside('regular', 1)).toBe(false);
+  it('offers an eCard alongside when pick-up is not allowed under two days', () => {
+    expect(offerEcardAlongside('large', 1, 'classic')).toBe(true);
+    expect(offerEcardAlongside('regular', 1, 'luxe')).toBe(true);
+    expect(offerEcardAlongside('regular', 1, 'signature')).toBe(false);
+    expect(offerEcardAlongside('regular', 5, 'luxe')).toBe(false);
   });
   it('walks the stage ladder for each mode', () => {
     expect(nextStage({ mode: 'advance', stage: 'checked' })).toBe('routed');

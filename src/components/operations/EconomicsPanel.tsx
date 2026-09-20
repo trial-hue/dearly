@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { Field } from '@/components/ui';
-import { FINISHES, MODES, SIZES, economics, type Costs } from '@/domain';
+import { BLEND, FINISHES, MODES, SIZES, economics, type Costs } from '@/domain';
 import { api } from '@/lib/fetcher';
 import { formatPence } from '@/lib/format';
 
@@ -59,7 +59,10 @@ export function EconomicsPanel({ costs: initial, customers }: { costs: Costs; cu
             <div className="text-lg font-bold tabular-nums">
               {formatPence(e.blendedContributionPence)}
             </div>
-            <div className="text-xs text-ink-2">Regular Signature, 72/20/8 mix</div>
+            <div className="text-xs text-ink-2">
+              {Math.round(BLEND.classic * 100)}% Classic, {Math.round(BLEND.signature * 100)}%
+              Signature, {Math.round(BLEND.luxe * 100)}% Luxe; Regular, advance post
+            </div>
           </div>
           <div className="rounded-md border border-line bg-surface px-3 py-2">
             <div className="text-[11px] font-medium text-ink-2">Break-even orders a year</div>

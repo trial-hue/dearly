@@ -94,7 +94,7 @@ export function defaultProposal(input: DefaultProposalInput): ProposalDraft | nu
   if (occasion.type === 'leaving') reasons.push('Giant group card offered');
   if (reasons.length === 0) reasons.push('Regular Signature by default');
 
-  const mode = chooseMode(size, daysLeft);
+  const mode = chooseMode(size, daysLeft, finish);
   if (daysLeft < 3) flags.push('urgent');
   if (occasion.type === 'eid') flags.push('subject to moon sighting');
   if ((COMMUNITY_OCCASIONS as readonly string[]).includes(occasion.type))
@@ -117,7 +117,7 @@ export function defaultProposal(input: DefaultProposalInput): ProposalDraft | nu
     }),
     font: 'hand',
     offerGiant: occasion.type === 'leaving',
-    offerEcard: offerEcardAlongside(size, daysLeft),
+    offerEcard: offerEcardAlongside(size, daysLeft, finish),
   };
 
   return {

@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { CardMock } from '@/components/card/CardMock';
 import { GuaranteeBadge } from '@/components/store/GuaranteeBadge';
-import { MODES } from '@/domain';
+import { MODES, PICKUP_PROMISE } from '@/domain';
 import { fmtDate, formatPence } from '@/lib/format';
 import type { Serialized } from '@/lib/serialize';
 import type { OrderView } from '@/server/services/orders';
@@ -28,7 +28,9 @@ export function OrderCard({ order: o, qrSvg }: { order: OrderDTO; qrSvg: string 
           <p className="text-sm text-ink-2">
             {o.mode === 'ecard'
               ? 'eCard, sent by link'
-              : `${MODES[o.mode].label} · ${o.stage === 'delivered' || o.stage === 'collected' ? 'arrived' : 'arrives by'} ${fmtDate(o.promisedDate)}`}
+              : o.mode === 'pickup'
+                ? `${MODES[o.mode].label} · ${o.stage === 'collected' ? 'collected' : PICKUP_PROMISE}`
+                : `${MODES[o.mode].label} · ${o.stage === 'delivered' ? 'arrived' : 'arrives by'} ${fmtDate(o.promisedDate)}`}
             {' · '}
             {formatPence(o.totalPence)}
           </p>

@@ -1,4 +1,4 @@
-import { MODES, MOONPIG, economics, forecast, toPence, type Actor } from '@/domain';
+import { STAMPS, economics, forecast, toPence, type Actor } from '@/domain';
 import { prisma } from '@/server/db';
 
 import * as decisions from './decisionLog';
@@ -42,7 +42,7 @@ export async function counters(accountId: string): Promise<Counters> {
     }),
     prisma.order.findMany({
       where: { accountId },
-      select: { mode: true, cardSpec: true, quote: true },
+      select: { mode: true, quote: true },
     }),
     decisions.countsByActor(),
     prisma.inventoryItem.count({ where: { direction: 'received', orderId: { not: null } } }),
@@ -57,9 +57,6 @@ export async function counters(accountId: string): Promise<Counters> {
   const decided = approved + skipped;
   const printed = orders.filter((o) => o.mode !== 'ecard');
   const advance = printed.filter((o) => o.mode === 'advance');
-  const regularAdvance = advance.filter(
-    (o) => (o.cardSpec as { size?: string }).size === 'regular',
-  ).length;
   const contributions = orders.map(
     (o) => (o.quote as { contributionPence?: number }).contributionPence ?? 0,
   );
@@ -72,8 +69,8 @@ export async function counters(accountId: string): Promise<Counters> {
     printedOrders: printed.length,
     advanceOrders: advance.length,
     advanceShare: printed.length ? Math.round((advance.length / printed.length) * 100) : null,
-    postageSavedPence:
-      regularAdvance * (toPence(MOONPIG.firstClass) - toPence(MODES.advance.price.regular)),
+    // Estimate: every advance order goes second class instead of first class.
+    postageSavedPence: advance.length * (toPence(STAMPS.firstClass) - toPence(STAMPS.secondClass)),
     avgContributionPence: contributions.length
       ? Math.round(contributions.reduce((a, b) => a + b, 0) / contributions.length)
       : null,

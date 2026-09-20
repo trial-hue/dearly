@@ -34,7 +34,7 @@ export function ProductOptions({
   const [open, setOpen] = useState(false);
   const today = new Date();
   const design = designById(designId);
-  const mode = allowedModes(size).includes('advance') ? 'advance' : 'tracked';
+  const mode = allowedModes(size, finish).includes('advance') ? 'advance' : 'tracked';
   const q = quote({ size, finish, mode: ecard ? 'ecard' : mode });
   const ecardPence = quote({ size, finish, mode: 'ecard' }).totalPence;
   const tracked = arrivalDate('tracked', size, addDays(today, 2), today);
@@ -150,9 +150,10 @@ export function ProductOptions({
             {formatPence(q.totalPence)}
           </span>
         </div>
-        {!ecard && q.moonpigPence != null ? (
+        {!ecard && q.moonpigPence != null && q.savingPence != null && q.savingPence > 0 ? (
           <p className="mt-1 text-xs text-ink-2" data-testid="moonpig-compare">
-            The same Regular card at Moonpig: {formatPence(q.moonpigPence)} with first class.
+            The same Regular card at Moonpig: {formatPence(q.moonpigPence)} with first class. You
+            save {formatPence(q.savingPence)}.
           </p>
         ) : null}
         <button

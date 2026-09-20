@@ -42,15 +42,33 @@ export const MODES = {
   },
   pickup: {
     label: 'Pick-up',
-    desc: 'Printed at a partner shop, ready in 2 hours',
-    price: { regular: 0 },
-    cost: { regular: 0.6 },
+    desc: 'Printed at a partner shop near them',
+    price: { regular: 1.95 },
+    cost: {},
     guarantee: false,
   },
   ecard: { label: 'eCard', desc: 'Sent by link today', price: {}, cost: {}, guarantee: false },
 } as const;
 
+/** What the customer is told about pick-up timing (never "arrives"). */
+export const PICKUP_PROMISE = 'Ready today, within 2 hours';
+
+/** Pick-up replaces the print cost: the partner shop's payout plus the stock Dearly supplies (ex VAT). */
+export const PICKUP = {
+  partnerPayout: 1.75,
+  stock: 0.25,
+  finishes: ['classic', 'signature'],
+  sizes: ['regular'],
+} as const;
+
 export const DIGITAL = { paired: 0.29, standalone: 0.79 } as const;
+
+/** First card free: once per account, Regular Classic or Signature, card price only, needs this many reminder dates. */
+export const FIRST_CARD_FREE = {
+  minReminders: 3,
+  sizes: ['regular'],
+  finishes: ['classic', 'signature'],
+} as const;
 
 export const GIFTS = [
   { id: 'none', label: 'No gift', price: 0 },
@@ -70,13 +88,24 @@ export const BUSINESS = {
   automateMonthly: 49,
   freeCards: 25,
   moonpigPerCard: 3.6,
-} as const; // ex VAT
+  paymentPct: 0.01, // of the invoice
+  finishes: ['classic', 'signature'],
+} as const; // ex VAT, Regular size
 
 export const BUSINESS_COSTS = {
-  officeDropDelivery: 0.3, // per card share of a batch courier, ex VAT (pilot assumption)
+  officeDropDelivery: 0.18, // per card, ex VAT
 } as const;
 
-export const MOONPIG = { card: 3.99, firstClass: 1.9, tracked: 2.79 } as const; // Regular size only
+/** Florist partners: fee owed per new account, commission owed to Dearly on the flower basket. */
+export const FLORIST = { referralFee: 1.5, commissionPct: 7, sampleBasket: 35 } as const;
+
+/** Royal Mail stamp prices used only for the "postage saved" estimate on Operations. */
+export const STAMPS = { firstClass: 1.8, secondClass: 0.91 } as const;
+
+/** The finish mix behind the blended contribution and break-even on Operations (Regular, advance post). */
+export const BLEND = { classic: 0.2, signature: 0.6, luxe: 0.2 } as const;
+
+export const MOONPIG = { card: 3.99, firstClass: 1.9, tracked: 2.79 } as const; // printed Regular cards only; never Large or Giant
 
 export const DEFAULT_COSTS = {
   payPct: 0.015,

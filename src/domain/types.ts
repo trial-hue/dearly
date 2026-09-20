@@ -85,6 +85,7 @@ export interface Quote {
   costs: QuoteCosts;
   contributionPence: number;
   guarantee: boolean;
+  firstCardFree: boolean;
 }
 
 export interface PersonLike {

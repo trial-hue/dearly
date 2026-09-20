@@ -9,7 +9,7 @@ import { useBasket } from '@/components/basket/basketStore';
 import { CardMock } from '@/components/card/CardMock';
 import { useToast } from '@/components/shell/Toast';
 import { ErrorNote } from '@/components/ui';
-import { chooseMode, quote, type CardSpec, type PrintedMode } from '@/domain';
+import { PICKUP_PROMISE, chooseMode, quote, type CardSpec, type PrintedMode } from '@/domain';
 import { api, useAction } from '@/lib/fetcher';
 import { fmtDate, formatPence } from '@/lib/format';
 import type { Serialized } from '@/lib/serialize';
@@ -98,7 +98,9 @@ export function PersonaliseEditor({
     });
   const onEcard = (on: boolean) =>
     patch(
-      on ? { mode: 'ecard' } : { mode: chooseMode(card.size, daysLeft), modeOverridden: false },
+      on
+        ? { mode: 'ecard' }
+        : { mode: chooseMode(card.size, daysLeft, card.finish), modeOverridden: false },
     );
   const onMode = (m: PrintedMode) => patch({ mode: m });
   const onDate = (date: string) =>
@@ -207,9 +209,10 @@ export function PersonaliseEditor({
   const backHref = from === 'reminder' ? '/reminders' : from === 'basket' ? '/basket' : '/cards';
   const backLabel = from === 'reminder' ? 'Reminders' : from === 'basket' ? 'Basket' : 'Cards';
   const isBusy = busy !== null;
+  // The Moonpig line shows only when Dearly is cheaper for the same printed Regular card.
   const note =
-    q.moonpigPence != null
-      ? `Moonpig: ${formatPence(q.moonpigPence)} for the same Regular card${q.savingPence && q.savingPence > 0 ? `, you save ${formatPence(q.savingPence)}` : ''}`
+    q.moonpigPence != null && q.savingPence != null && q.savingPence > 0
+      ? `Moonpig ${formatPence(q.moonpigPence)}, you save ${formatPence(q.savingPence)}`
       : q.moonpigNote;
 
   const stage = (
@@ -386,7 +389,7 @@ export function PersonaliseEditor({
         secondary={
           from === 'reminder' && !ecard ? (
             <span className="hidden text-xs text-ink-2 sm:inline">
-              Arrives {fmtDate(p.arrival)}
+              {card.mode === 'pickup' ? PICKUP_PROMISE : `Arrives ${fmtDate(p.arrival)}`}
             </span>
           ) : null
         }

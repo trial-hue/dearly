@@ -32,9 +32,9 @@ export function planRecovery(
   }
   actions.push({
     type: 'discount',
-    label: '50% off the next card',
+    label: '50% off the card price of the next order',
     pence: 0,
-    detail: `Code DEARLY50-${order.id.slice(-4).toUpperCase()}`,
+    detail: `Single-use code DEARLY50-${order.id.slice(-4).toUpperCase()}, delivery not included`,
   });
   if (daysLeft >= 2) {
     const reprintCost = toPence(PRINT_COST[size].signature) + toPence(MODES.tracked.cost[size]);

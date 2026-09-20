@@ -8,7 +8,7 @@ import { CardMock } from '@/components/card/CardMock';
 import { useToast } from '@/components/shell/Toast';
 import { GuaranteeBadge } from '@/components/store/GuaranteeBadge';
 import { ErrorNote } from '@/components/ui';
-import { FINISHES, MODES, SIZES } from '@/domain';
+import { FINISHES, MODES, PICKUP_PROMISE, SIZES } from '@/domain';
 import { api, useAction } from '@/lib/fetcher';
 import { fmtDate, formatPence } from '@/lib/format';
 import type { Serialized } from '@/lib/serialize';
@@ -107,7 +107,7 @@ export function BasketView() {
                   <p className="text-sm text-ink-2">
                     {p.card.mode === 'ecard'
                       ? 'eCard, sent by link today'
-                      : `${SIZES[p.card.size].label}, ${FINISHES[p.card.finish].label} · ${MODES[p.card.mode].label}, arrives ${fmtDate(p.arrival)}`}
+                      : `${SIZES[p.card.size].label}, ${FINISHES[p.card.finish].label} · ${MODES[p.card.mode].label}, ${p.card.mode === 'pickup' ? PICKUP_PROMISE.charAt(0).toLowerCase() + PICKUP_PROMISE.slice(1) : `arrives ${fmtDate(p.arrival)}`}`}
                     {p.card.digital ? ' · digital copy' : ''}
                     {p.card.gift !== 'none' ? ' · with a gift' : ''}
                   </p>

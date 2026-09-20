@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { CardMock } from '@/components/card/CardMock';
 import { useToast } from '@/components/shell/Toast';
 import { ErrorNote } from '@/components/ui';
-import { ordinal } from '@/domain';
+import { PICKUP_PROMISE, ordinal } from '@/domain';
 import { api, useAction } from '@/lib/fetcher';
 import { daysLabel, fmtDate, formatPence } from '@/lib/format';
 import { OCCASION_LABELS } from '@/lib/occasions';
@@ -62,7 +62,11 @@ export function ReminderCard({
           {p.card.message}
         </p>
         <p className="mt-1 text-sm">
-          {p.card.mode === 'ecard' ? 'Sent by link on the day' : `Arrives by ${fmtDate(p.arrival)}`}
+          {p.card.mode === 'ecard'
+            ? 'Sent by link on the day'
+            : p.card.mode === 'pickup'
+              ? PICKUP_PROMISE
+              : `Arrives by ${fmtDate(p.arrival)}`}
         </p>
         {p.messageBy === 'ai' || p.madeBy === 'ai' ? (
           <p className="mt-1 text-xs font-semibold text-success">

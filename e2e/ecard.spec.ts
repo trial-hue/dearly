@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { resetDemo } from './helpers';
+import { PRICES } from './prices';
 
 test.describe('eCards', () => {
   test.beforeEach(async ({ page }) => resetDemo(page));
@@ -14,7 +15,7 @@ test.describe('eCards', () => {
     await page.getByTestId('product-tile-bday-confetti-pop').click();
     await expect(page).toHaveURL(/\/card\/bday-confetti-pop\?ecard=1/);
     await expect(page.getByTestId('product-ecard')).toBeChecked();
-    await expect(page.getByTestId('price-total')).toHaveText('£0.79');
+    await expect(page.getByTestId('price-total')).toHaveText(PRICES.ecard);
 
     await page.getByTestId('product-personalise').click();
     await page.getByTestId('recipient-select').selectOption('person_dan');
@@ -22,7 +23,7 @@ test.describe('eCards', () => {
 
     await expect(page.getByTestId('editor')).toBeVisible();
     await expect(page.getByTestId('ecard-toggle')).toBeChecked();
-    await expect(page.getByTestId('price-total')).toHaveText('£0.79');
+    await expect(page.getByTestId('price-total')).toHaveText(PRICES.ecard);
     // Edits keep the drafted message (ADR 0006).
     await page.getByTestId('step-2').click();
     await expect(page.getByTestId('message-input')).toHaveValue(/Dan/);

@@ -12,6 +12,7 @@ import {
   chooseMode,
   daysBetween,
   defaultProposal,
+  firstCardFreeEligible,
   formatPence,
   isOccasionType,
   isoDate,
@@ -47,6 +48,18 @@ export function parseCard(value: unknown): CardSpec {
 
 type ProposalRow = Proposal & { person: Person; orders?: { id: string }[] };
 
+/**
+ * First card free (once per account): no printed card ordered yet and at least three reminder
+ * dates among active people. The size and finish rule is applied inside quote().
+ */
+export async function firstCardFreeFor(accountId: string): Promise<boolean> {
+  const [printedOrders, reminderDates] = await Promise.all([
+    prisma.order.count({ where: { accountId, mode: { not: 'ecard' } } }),
+    prisma.occasion.count({ where: { person: { accountId, pausedReason: null } } }),
+  ]);
+  return firstCardFreeEligible({ printedOrders, reminderDates });
+}
+
 export interface ProposalView {
   id: string;
   key: string;
@@ -79,7 +92,12 @@ export interface ProposalView {
   orderId: string | null;
 }
 
-export function toView(row: ProposalRow, today: Date, costs: Costs): ProposalView {
+export function toView(
+  row: ProposalRow,
+  today: Date,
+  costs: Costs,
+  firstCardFree = false,
+): ProposalView {
   const card = parseCard(row.cardSpec);
   const type = keyType(row.key);
   const dueDate = startOfDay(row.dueDate);
@@ -105,14 +123,14 @@ export function toView(row: ProposalRow, today: Date, costs: Costs): ProposalVie
     daysLeft,
     age: null,
     card,
-    quote: quote(card, costs),
+    quote: quote({ ...card, firstCardFree }, costs),
     arrival: arrivalDate(card.mode, card.size, dueDate, today),
     bucket: bucketFor(daysLeft),
     madeBy: row.madeBy,
     messageBy: row.messageBy,
     aiReason: row.aiReason,
     flags,
-    allowedModes: allowedModes(card.size),
+    allowedModes: allowedModes(card.size, card.finish),
     approvable: row.status === 'proposed' && check.ok,
     blockReason: check.ok ? null : check.reason,
     orderId: row.orders?.[0]?.id ?? null,
@@ -198,7 +216,8 @@ export async function listProposals(accountId: string, today: Date): Promise<Tod
     include: { person: true, orders: { select: { id: true } } },
     orderBy: { dueDate: 'asc' },
   });
-  const views = await withAges(rows.map((r) => toView(r, today, costs)));
+  const free = await firstCardFreeFor(accountId);
+  const views = await withAges(rows.map((r) => toView(r, today, costs, free)));
   const people = await prisma.person.findMany({
     where: { accountId },
     include: { occasions: true },
@@ -244,7 +263,9 @@ export async function getProposal(key: string, today: Date): Promise<ProposalVie
   });
   if (!row) return null;
   const { costs } = await getSettings();
-  const [view] = await withAges([toView(row, today, costs)]);
+  const [view] = await withAges([
+    toView(row, today, costs, await firstCardFreeFor(row.person.accountId)),
+  ]);
   return view ?? null;
 }
 
@@ -271,11 +292,14 @@ export async function updateCard(
   if (parsed.mode && parsed.mode !== card.mode)
     next.modeOverridden = parsed.mode !== 'ecard' ? true : card.modeOverridden;
   if (next.mode !== 'ecard') {
-    if (parsed.size && parsed.size !== card.size && !next.modeOverridden)
-      next.mode = chooseMode(next.size, daysLeft);
+    const sizeOrFinishChanged =
+      (parsed.size != null && parsed.size !== card.size) ||
+      (parsed.finish != null && parsed.finish !== card.finish);
+    if (sizeOrFinishChanged && !next.modeOverridden)
+      next.mode = chooseMode(next.size, daysLeft, next.finish);
     if (next.size === 'giant') next.mode = 'tracked';
-    if (!allowedModes(next.size).includes(next.mode as 'advance'))
-      next.mode = chooseMode(next.size, daysLeft);
+    if (!allowedModes(next.size, next.finish).includes(next.mode as 'advance'))
+      next.mode = chooseMode(next.size, daysLeft, next.finish);
   }
   if (parsed.message !== undefined && parsed.message !== card.message) {
     await prisma.proposal.update({ where: { key }, data: { messageBy: 'person' } });
@@ -289,7 +313,9 @@ export async function updateCard(
     include: { person: true, orders: { select: { id: true } } },
   });
   const { costs } = await getSettings();
-  const [view] = await withAges([toView(updated, today, costs)]);
+  const [view] = await withAges([
+    toView(updated, today, costs, await firstCardFreeFor(updated.person.accountId)),
+  ]);
   return view ?? null;
 }
 
@@ -340,7 +366,7 @@ export async function approveProposal(
   if (!check.ok) return { ok: false, reason: check.reason };
 
   const { costs } = await getSettings();
-  const q = quote(card, costs);
+  const q = quote({ ...card, firstCardFree: await firstCardFreeFor(accountId) }, costs);
   const type = keyType(row.key);
   const dueDate = startOfDay(row.dueDate);
   const promised = arrivalDate(card.mode, card.size, dueDate, today);
@@ -526,10 +552,10 @@ export async function setProposalDate(
   const card = parseCard(row.cardSpec);
   const next: CardSpec = { ...card };
   if (next.mode !== 'ecard') {
-    if (!next.modeOverridden) next.mode = chooseMode(next.size, daysLeft);
+    if (!next.modeOverridden) next.mode = chooseMode(next.size, daysLeft, next.finish);
     if (next.size === 'giant') next.mode = 'tracked';
-    if (!allowedModes(next.size).includes(next.mode as 'advance'))
-      next.mode = chooseMode(next.size, daysLeft);
+    if (!allowedModes(next.size, next.finish).includes(next.mode as 'advance'))
+      next.mode = chooseMode(next.size, daysLeft, next.finish);
   }
   if (row.occasion.adhocDate)
     await prisma.occasion.update({ where: { id: row.occasionId }, data: { adhocDate: date } });
@@ -550,7 +576,8 @@ export async function openProposalsForAi(accountId: string, today: Date) {
     include: { person: true },
     orderBy: { dueDate: 'asc' },
   });
-  const views = await withAges(rows.map((r) => toView(r, today, costs)));
+  const free = await firstCardFreeFor(accountId);
+  const views = await withAges(rows.map((r) => toView(r, today, costs, free)));
   const pastMessages = await prisma.order.findMany({
     where: { accountId },
     select: { personId: true, cardSpec: true },
@@ -604,8 +631,10 @@ export async function applyAiProposal(
     finish: patch.finish,
     gift: patch.gift,
   };
-  if (!next.modeOverridden) next.mode = chooseMode(next.size, daysLeft);
+  if (!next.modeOverridden) next.mode = chooseMode(next.size, daysLeft, next.finish);
   if (next.size === 'giant') next.mode = 'tracked';
+  if (!allowedModes(next.size, next.finish).includes(next.mode as 'advance'))
+    next.mode = chooseMode(next.size, daysLeft, next.finish);
   await prisma.proposal.update({
     where: { key },
     data: { cardSpec: json(next), madeBy: 'ai', messageBy: 'ai', aiReason: patch.reason },

@@ -61,6 +61,10 @@ Cards are the product: a catalogue of 49 layered SVG designs in `src/catalogue` 
 
 Next.js App Router with TypeScript in strict mode. `src/domain` is pure TypeScript with no I/O: pricing in integer pence, the delivery rule, the calendar, routing, proposals, recovery, forecast and unit economics, each unit-tested. `src/server/services` are the only callers of Prisma. Route handlers under `src/app/api` validate input with `zod`, call one service and return problem JSON on failure. Server components read services directly; client components mutate through the API and refresh. Simulated partners (payments, printers, carriers, messaging, storage) sit behind adapter interfaces in `src/server/adapters`. The AI gateway in `src/server/ai` has a provider interface, a Claude provider on Anthropic's official SDK, a mock provider for tests, and one file per job with its prompt, `zod` schema, validator and rules-based fallback. Every AI or rules decision is written to the `Decision` table that Operations shows. See `docs/architecture.md`.
 
+## Pricing in one place
+
+Every price, cost and fee lives in `src/domain/constants.ts`; everything else derives from it through `quote()` and the economics functions, and a unit test fails when a price-like literal appears anywhere in `src/app`, `src/components` or `src/server`. `docs/pricing.md` is generated from the constants by `pnpm docs:pricing` and CI fails if it drifts. The headline figures: a Regular Signature card by advance post is £4.94 (Moonpig £5.89) and contributes £1.93; pick-up is £1.95, Regular Classic or Signature only, ready today within 2 hours; the blended contribution is £2.07 and the team breaks even at about 159,000 orders a year. `docs/pricing-audit.md` lists every place the code disagreed with the specification and how it was resolved.
+
 ## Environment variables
 
 All variables are validated at start-up by `src/env.ts`; a missing or invalid value fails fast with a message.
@@ -97,6 +101,8 @@ Payments, printing, postage and carrier tracking, HR sync, florist systems, emai
 ## Documentation
 
 - `docs/architecture.md`: layers, data model, request flow, AI gateway.
+- `docs/pricing.md`: the canonical prices, costs and formulas, generated from the constants.
+- `docs/pricing-audit.md`: the pricing audit, disagreements found and screenshots of the verification.
 - `docs/runbook.md`: deploy, migrate, seed and reset, rotate the key, read the decision log, provider outage.
 - `docs/adr/`: decisions with context and consequences.
 - `docs/backlog.md`: what was cut and what comes next.

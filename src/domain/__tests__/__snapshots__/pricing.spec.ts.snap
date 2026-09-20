@@ -1,0 +1,24 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`price matrix snapshot > every size, finish and mode 1`] = `
+[
+  "regular classic advance: total 394 exVat 328 contribution 124 moonpig 589 saving 195",
+  "regular classic tracked: total 574 exVat 478 contribution 130 moonpig 678 saving 104",
+  "regular classic pickup: total 494 exVat 412 contribution 171 moonpig - saving -",
+  "regular signature advance: total 494 exVat 412 contribution 193 moonpig 589 saving 95",
+  "regular signature tracked: total 674 exVat 562 contribution 199 moonpig 678 saving 4",
+  "regular signature pickup: total 594 exVat 495 contribution 253 moonpig - saving -",
+  "regular luxe advance: total 744 exVat 620 contribution 333 moonpig 589 saving -155",
+  "regular luxe tracked: total 924 exVat 770 contribution 338 moonpig 678 saving -246",
+  "large classic advance: total 694 exVat 578 contribution 248 moonpig - saving -",
+  "large classic tracked: total 874 exVat 728 contribution 260 moonpig - saving -",
+  "large signature advance: total 844 exVat 703 contribution 348 moonpig - saving -",
+  "large signature tracked: total 1024 exVat 853 contribution 360 moonpig - saving -",
+  "large luxe advance: total 1094 exVat 912 contribution 467 moonpig - saving -",
+  "large luxe tracked: total 1274 exVat 1062 contribution 480 moonpig - saving -",
+  "giant classic tracked: total 1398 exVat 1165 contribution 416 moonpig - saving -",
+  "giant signature tracked: total 1598 exVat 1332 contribution 550 moonpig - saving -",
+  "giant luxe tracked: total 1898 exVat 1582 contribution 715 moonpig - saving -",
+  "ecard: total 79",
+]
+`;

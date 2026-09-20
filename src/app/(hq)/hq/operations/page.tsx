@@ -146,7 +146,11 @@ export default async function OperationsPage() {
           value={c.advanceShare == null ? '—' : `${c.advanceShare}%`}
           note={`${c.advanceOrders} of ${c.printedOrders} printed`}
         />
-        <Stat label="Postage saved vs first class" value={formatPence(c.postageSavedPence)} />
+        <Stat
+          label="Postage saved vs first class"
+          value={formatPence(c.postageSavedPence)}
+          note="estimate: second class instead of first, per advance order"
+        />
         <Stat
           label="Average contribution"
           value={c.avgContributionPence == null ? '—' : formatPence(c.avgContributionPence)}

@@ -76,7 +76,7 @@ describe('business pricing', () => {
     expect(r.dearlyPence).toBe(280 * 310 + 120 * 230);
     expect(r.savingPence).toBe(r.moonpigPence - r.dearlyPence);
     const auto = annualCalculator({ cardsPerYear: 400, postedShare: 0.7, automate: true });
-    expect(auto.includedCards).toBe(280);
+    expect(auto.includedCards).toBe(25); // the first 25 cards are free, once
     expect(auto.subscriptionPence).toBe(58_800);
   });
 });

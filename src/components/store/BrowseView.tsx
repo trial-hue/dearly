@@ -1,6 +1,8 @@
 import { filterDesigns, type Tag } from '@/catalogue';
 import type { OccasionType } from '@/domain';
+import { formatPence } from '@/lib/format';
 import { ALL_OCCASIONS, OCCASION_LABELS, OCCASION_SLUGS } from '@/lib/occasions';
+import { fromPricePence } from '@/lib/pricing';
 
 import { EmptyState } from './EmptyState';
 import { FilterChips, STYLES, WHO_FOR, type ChipGroup } from './FilterChips';
@@ -59,7 +61,8 @@ export function BrowseView({
         <div>
           <h1 className="t-h1">{title}</h1>
           <p className="text-sm text-ink-2">
-            Three sizes, three finishes, your words inside. From £2.99 plus delivery.
+            Three sizes, three finishes, your words inside. From {formatPence(fromPricePence())}{' '}
+            plus delivery.
           </p>
         </div>
         <SortSelect />

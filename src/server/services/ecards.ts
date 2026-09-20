@@ -4,6 +4,7 @@ import {
   addDays,
   addYears,
   defaultProposal,
+  formatPence,
   isOccasionType,
   quote,
   startOfDay,
@@ -116,13 +117,13 @@ export async function sendEcard(accountId: string, input: SendEcardInput, today:
     {
       actor: 'person',
       job: 'ecard',
-      summary: `Sent a ${TITLES[input.occasion].toLowerCase()} eCard to ${person.name} for 79p${narrationUrl ? ' with narration' : ''}${clipUrl ? ' and a clip' : ''}`,
+      summary: `Sent a ${TITLES[input.occasion].toLowerCase()} eCard to ${person.name} for ${formatPence(q.totalPence)}${narrationUrl ? ' with narration' : ''}${clipUrl ? ' and a clip' : ''}`,
       orderId: order.id,
     },
     {
       actor: 'rule',
       job: 'payment',
-      summary: 'Payment of £0.79 captured (simulated)',
+      summary: `Payment of ${formatPence(q.totalPence)} captured (simulated)`,
       orderId: order.id,
     },
   ]);

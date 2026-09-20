@@ -44,6 +44,8 @@ jobs:
       - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm test -- --coverage
+      - name: docs/pricing.md matches the constants
+        run: pnpm docs:pricing:check
       - run: pnpm build
       - run: pnpm db:migrate
       - run: pnpm exec tsx prisma/seed.ts --reset

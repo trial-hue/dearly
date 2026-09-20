@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { FinishSchema } from '@/domain';
+import { BusinessFinishSchema } from '@/domain';
 import { now } from '@/server/clock';
 import { ok, problem, readJson } from '@/server/http';
 import { scheduleBatch } from '@/server/services/business';
@@ -20,7 +20,7 @@ const Row = z.object({
 
 const Body = z.object({
   option: z.enum(['posted', 'officeDrop']),
-  finish: FinishSchema,
+  finish: BusinessFinishSchema,
   automate: z.boolean().default(false),
   giantForLeavers: z.boolean().default(false),
   rows: z.array(Row).min(1).max(500),

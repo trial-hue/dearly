@@ -20,13 +20,13 @@ describe('forecast', () => {
 });
 
 describe('economics', () => {
-  it('blends contribution and finds break-even near 173,000 orders', () => {
-    expect(Math.abs(blendedContributionPence() - 191)).toBeLessThanOrEqual(3);
+  it('blends 20/60/20 by finish to 2.07 and breaks even at 159,107 orders', () => {
+    expect(blendedContributionPence()).toBe(207);
     const e = economics();
-    expect(e.breakEvenOrders).toBeGreaterThan(165_000);
-    expect(e.breakEvenOrders).toBeLessThan(180_000);
+    expect(e.breakEvenOrders).toBe(159_107);
     expect(e.breakEvenCustomers).toBe(Math.ceil(e.breakEvenOrders / 4));
     expect(e.teamCostPerOrderPence(400_000)).toBe(83);
+    expect(e.teamCostPerOrderPence(210_000)).toBe(157);
   });
   it('lowers break-even when the team costs less', () => {
     const cheaper = economics({ ...DEFAULT_COSTS, teamPerYear: 200_000 });

@@ -1,5 +1,7 @@
 import { addDays, isoDate, monthIndex, startOfDay } from './calendar';
+import { FLORIST } from './constants';
 import { normaliseOccasion, normaliseRelationship } from './importPeople';
+import { toPence } from './money';
 import type { OccasionType } from './types';
 
 export interface FloristReading {
@@ -79,16 +81,16 @@ export function sampleFloristOrder(today: Date): string {
   });
   return [
     'Bloom and Co, order 4471',
-    'Bouquet: Autumn Glow, £35.00',
+    `Bouquet: Autumn Glow, £${FLORIST.sampleBasket.toFixed(2)}`,
     `Deliver on: ${long}`,
     'Card message: Happy 70th birthday Mum! With all our love, Claire, Ravi and the kids xx',
     'Recipient: Mrs J Sharma, Leicester',
   ].join('\n');
 }
 
-export const FLORIST_REFERRAL_FEE_PENCE = 150;
-export const FLORIST_COMMISSION_PCT = 7;
+export const FLORIST_REFERRAL_FEE_PENCE = toPence(FLORIST.referralFee);
+export const FLORIST_COMMISSION_PCT = FLORIST.commissionPct;
 
 export function expectedCommissionPence(basketPence: number): number {
-  return Math.round((basketPence * FLORIST_COMMISSION_PCT) / 100);
+  return Math.round((basketPence * FLORIST.commissionPct) / 100);
 }

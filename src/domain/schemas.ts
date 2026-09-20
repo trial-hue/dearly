@@ -4,6 +4,8 @@ import { AGENT_ACTIONS, DESIGNS, GIFTS, TITLES } from './constants';
 
 export const SizeSchema = z.enum(['regular', 'large', 'giant']);
 export const FinishSchema = z.enum(['classic', 'signature', 'luxe']);
+/** Business cards are Regular Classic or Signature only. */
+export const BusinessFinishSchema = z.enum(['classic', 'signature']);
 export const ModeSchema = z.enum(['advance', 'tracked', 'pickup', 'ecard']);
 export const DesignSchema = z.enum(DESIGNS);
 export const GiftSchema = z.enum(GIFTS.map((g) => g.id) as [string, ...string[]]);

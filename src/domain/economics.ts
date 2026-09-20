@@ -1,6 +1,6 @@
-import { DEFAULT_COSTS, FORECAST } from './constants';
-import { toPence } from './money';
-import { contributionTable, quote } from './pricing';
+import { BLEND, DEFAULT_COSTS, FORECAST } from './constants';
+import { roundPence, toPence } from './money';
+import { contributionExact, contributionTable } from './pricing';
 import type { ContributionRow, Costs } from './types';
 
 export interface Economics {
@@ -11,27 +11,32 @@ export interface Economics {
   teamCostPerOrderPence: (ordersPerYear: number) => number;
 }
 
-/** Contribution of a Regular Signature card weighted by the forecast mode split. */
+/** Exact blended contribution of a Regular card by advance post: 20% Classic, 60% Signature, 20% Luxe. */
+export function blendedContributionExact(costs: Costs = DEFAULT_COSTS): number {
+  const c = (finish: 'classic' | 'signature' | 'luxe') =>
+    contributionExact({ size: 'regular', finish, mode: 'advance' }, costs);
+  return BLEND.classic * c('classic') + BLEND.signature * c('signature') + BLEND.luxe * c('luxe');
+}
+
+/** Blended contribution rounded to whole pence for display. */
 export function blendedContributionPence(costs: Costs = DEFAULT_COSTS): number {
-  const { advance, tracked, pickup } = FORECAST.split;
-  const c = (mode: 'advance' | 'tracked' | 'pickup') =>
-    quote({ size: 'regular', finish: 'signature', mode }, costs).contributionPence;
-  return Math.round(advance * c('advance') + tracked * c('tracked') + pickup * c('pickup'));
+  return roundPence(blendedContributionExact(costs));
 }
 
 export function economics(costs: Costs = DEFAULT_COSTS): Economics {
-  const blended = blendedContributionPence(costs);
+  const blendedExact = blendedContributionExact(costs);
   const teamPence = toPence(costs.teamPerYear);
-  const breakEvenOrders = blended > 0 ? Math.ceil(teamPence / blended) : Infinity;
+  // The specification reports the quotient truncated to whole orders (33,000,000 / 207.41 = 159,107).
+  const breakEvenOrders = blendedExact > 0 ? Math.floor(teamPence / blendedExact + 1e-9) : Infinity;
   return {
     table: contributionTable(costs),
-    blendedContributionPence: blended,
+    blendedContributionPence: roundPence(blendedExact),
     breakEvenOrders,
     breakEvenCustomers: Number.isFinite(breakEvenOrders)
       ? Math.ceil(breakEvenOrders / FORECAST.ordersPerCustomerYear)
       : Infinity,
     teamCostPerOrderPence: (ordersPerYear: number) =>
-      ordersPerYear > 0 ? Math.round(teamPence / ordersPerYear) : 0,
+      ordersPerYear > 0 ? roundPence(teamPence / ordersPerYear) : 0,
   };
 }
 
