@@ -23,6 +23,9 @@ test.describe('eCards', () => {
     await expect(page.getByTestId('editor')).toBeVisible();
     await expect(page.getByTestId('ecard-toggle')).toBeChecked();
     await expect(page.getByTestId('price-total')).toHaveText('£0.79');
+    // Edits keep the drafted message (ADR 0006).
+    await page.getByTestId('step-2').click();
+    await expect(page.getByTestId('message-input')).toHaveValue(/Dan/);
     await page.getByTestId('step-4').click();
     await page.getByTestId('builtin-voice').click();
     await page.getByTestId('approve').click();

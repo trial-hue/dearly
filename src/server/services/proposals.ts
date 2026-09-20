@@ -258,7 +258,13 @@ export async function updateCard(
 ): Promise<ProposalView | null> {
   const row = await prisma.proposal.findUnique({ where: { key }, include: { person: true } });
   if (!row) return null;
-  const parsed = CardPatchSchema.parse(patch);
+  // zod's partial() still fills in field defaults for absent keys; keep only what was sent (ADR 0006).
+  const validated = CardPatchSchema.parse(patch);
+  const sent =
+    patch && typeof patch === 'object' ? new Set(Object.keys(patch as object)) : new Set<string>();
+  const parsed = Object.fromEntries(
+    Object.entries(validated).filter(([k]) => sent.has(k)),
+  ) as typeof validated;
   const card = parseCard(row.cardSpec);
   const daysLeft = daysBetween(startOfDay(today), startOfDay(row.dueDate));
   const next: CardSpec = { ...card, ...(parsed as Partial<CardSpec>) };
