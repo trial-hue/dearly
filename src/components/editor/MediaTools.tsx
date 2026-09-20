@@ -162,7 +162,7 @@ export function MediaTools({
       <h3 className="mb-2 text-sm font-bold">Photos, handwriting and drawings</h3>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="card space-y-2">
-          <label className="text-xs font-medium text-ink2" htmlFor="photo-input">
+          <label className="text-xs font-medium text-ink-2" htmlFor="photo-input">
             Photo check for the front
           </label>
           <input
@@ -174,7 +174,7 @@ export function MediaTools({
           />
           {verdict ? (
             <div className="space-y-2 text-sm">
-              <p className={verdict.ok ? 'text-green' : 'text-amber'}>{verdict.text}</p>
+              <p className={verdict.ok ? 'text-success' : 'text-warning'}>{verdict.text}</p>
               <button
                 type="button"
                 className="btn btn-sm"
@@ -192,7 +192,7 @@ export function MediaTools({
           )}
         </div>
         <div className="card space-y-2">
-          <label className="text-xs font-medium text-ink2" htmlFor="handwriting-input">
+          <label className="text-xs font-medium text-ink-2" htmlFor="handwriting-input">
             Handwriting by photo
           </label>
           <input
@@ -218,7 +218,7 @@ export function MediaTools({
           <canvas ref={canvasRef} className="hidden" aria-hidden="true" />
         </div>
         <div className="card space-y-2">
-          <label className="text-xs font-medium text-ink2" htmlFor="drawing-input">
+          <label className="text-xs font-medium text-ink-2" htmlFor="drawing-input">
             A child&rsquo;s drawing as the front
           </label>
           <input
@@ -230,7 +230,7 @@ export function MediaTools({
           />
         </div>
         <div className="card space-y-2">
-          <span className="text-xs font-medium text-ink2">AI card front</span>
+          <span className="text-xs font-medium text-ink-2">AI card front</span>
           <button
             type="button"
             className="btn btn-sm"

@@ -118,7 +118,7 @@ export default async function OperationsPage() {
           <div key={r.title} className="card">
             <h3 className="font-bold">{r.title}</h3>
             <p className="muted text-sm">{r.does}</p>
-            <p className="mt-2 text-xs font-medium text-green">What the AI does for them</p>
+            <p className="mt-2 text-xs font-medium text-success">What the AI does for them</p>
             <ul className="list-disc pl-4 text-sm">
               {r.ai.map((a) => (
                 <li key={a}>{a}</li>

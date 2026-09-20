@@ -52,7 +52,7 @@ export function ForecastPanel({
     <div className="card" data-testid="forecast">
       <div className="flex flex-wrap items-end gap-4">
         <label className="flex-1" htmlFor="forecast-customers">
-          <span className="text-xs font-medium text-ink2">
+          <span className="text-xs font-medium text-ink-2">
             Simulated customers: {customers.toLocaleString('en-GB')}
           </span>
           <input

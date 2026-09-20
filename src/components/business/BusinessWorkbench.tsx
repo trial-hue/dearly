@@ -68,7 +68,7 @@ export function BusinessWorkbench({ staffText }: { staffText: string }) {
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
       <section className="card">
-        <label htmlFor="staff-text" className="text-xs font-medium text-ink2">
+        <label htmlFor="staff-text" className="text-xs font-medium text-ink-2">
           Staff list (name, date, occasion, postcode)
         </label>
         <textarea
@@ -217,7 +217,7 @@ export function BusinessWorkbench({ staffText }: { staffText: string }) {
           <span>Giant group card for anyone leaving, signed by the whole team, tracked.</span>
         </label>
         {pricing ? (
-          <div className="rounded-md bg-surface2 p-3 text-sm" data-testid="batch-pricing">
+          <div className="rounded-md bg-surface-2 p-3 text-sm" data-testid="batch-pricing">
             <div className="flex justify-between">
               <span>
                 {pricing.cards - pricing.giantCards} cards at {formatPence(pricing.unitPence)}

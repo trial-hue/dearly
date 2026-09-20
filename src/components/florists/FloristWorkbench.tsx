@@ -18,7 +18,7 @@ export function FloristWorkbench({ sample }: { sample: string }) {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <section className="card">
-        <label htmlFor="florist-text" className="text-xs font-medium text-ink2">
+        <label htmlFor="florist-text" className="text-xs font-medium text-ink-2">
           Order text from the florist&rsquo;s system
         </label>
         <textarea

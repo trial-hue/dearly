@@ -48,7 +48,7 @@ export function DemoControls({
             onClick={() =>
               run(`delay-${o.id}`, async () => {
                 await api(`/api/orders/${o.id}/delay`, { json: {} });
-                toast('Delay simulated. Recovery has run.');
+                toast('Delay triggered. Recovery has run.');
               })
             }
           >

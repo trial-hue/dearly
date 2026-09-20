@@ -52,7 +52,7 @@ export function ThemeToggle() {
           type="button"
           onClick={() => apply(t)}
           aria-pressed={theme === t}
-          className={`px-2 py-1 first:rounded-l-md last:rounded-r-md ${theme === t ? 'bg-surface2 font-bold' : 'hover:bg-surface2'}`}
+          className={`px-2 py-1 first:rounded-l-md last:rounded-r-md ${theme === t ? 'bg-surface-2 font-bold' : 'hover:bg-surface-2'}`}
         >
           {t === 'system' ? 'System' : t === 'light' ? 'Light' : 'Dark'}
         </button>

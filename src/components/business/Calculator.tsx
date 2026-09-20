@@ -58,7 +58,7 @@ export function Calculator() {
         <dd className="text-lg font-bold tabular-nums">{formatPence(r.moonpigPence)}</dd>
         <dt className="muted">Saving</dt>
         <dd
-          className={`text-lg font-bold tabular-nums ${r.savingPence >= 0 ? 'text-green' : 'text-red'}`}
+          className={`text-lg font-bold tabular-nums ${r.savingPence >= 0 ? 'text-success' : 'text-danger'}`}
         >
           {formatPence(r.savingPence)}
         </dd>
