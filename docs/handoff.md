@@ -1,6 +1,33 @@
 # Hand-off
 
-State of the Dearly pilot at hand-off, 20 September 2026.
+State of the Dearly pilot at hand-off, 20 September 2026. The storefront rebuild lives on the branch `ui/storefront`; the section immediately below covers it, the rest describes the pilot as first delivered.
+
+## Storefront rebuild (`ui/storefront`)
+
+What was done, in commit order: the restructure plan, test selectors moved to `data-testid`, new tokens and Plus Jakarta Sans, the three layouts with redirects, a 49-design catalogue and `CardMock`, Home, Browse and Product, the Personalise flow (absorbing the drawer editor and the eCard studio), Reminders, Basket, Orders, My cards, Help, the recipient page, the business console and HQ with a component kit, then dead-code removal. Every commit passed `pnpm check`.
+
+| Acceptance item                                                                                                           | State                                                                                                                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No left navigation rail in layout A                                                                                       | Done: top header, category row, footer, bottom tab bar under 768px                                                                                                                                               |
+| Home, Browse, Product, Personalise, Basket work end to end with seeded data                                               | Done; the `browse-to-order` scenario covers it                                                                                                                                                                   |
+| First-time viewer goes Home → Birthday → design → size and finish → Personalise → Basket → pay → Orders without Reminders | Done, tested                                                                                                                                                                                                     |
+| A reminder can be approved in one tap from Home and from Reminders                                                        | Done: `ReminderCard` on the Home carousel and on Reminders                                                                                                                                                       |
+| eCard studio features exist as steps in Personalise; `/studio` redirects                                                  | Done: front (eCard toggle), extras (animation, narration, clip, drawing), preview dialog; `/studio` → `/cards`                                                                                                   |
+| At least 48 designs; tiles image-first with at most a badge and a price                                                   | 49 designs, unit-tested; `ProductTile` shows the card, an optional badge and "from £2.99"                                                                                                                        |
+| No internal or pilot wording on layout A                                                                                  | Done; audited by grep. The only pilot controls are in the footer Demo menu                                                                                                                                       |
+| Regular Signature by advance post totals £4.94; domain tests unchanged and green                                          | Yes: 69 unit tests, none of the 64 domain tests changed                                                                                                                                                          |
+| All previous e2e scenarios pass; "browse to order" added                                                                  | 8 scenarios pass against a production build                                                                                                                                                                      |
+| Visual snapshots for 8 key screens at two sizes; axe and Lighthouse targets                                               | 16 PNGs in `docs/design/screens/`; axe clean on Home, Browse, Product, Personalise, Reminders and the recipient page; Lighthouse performance 92 and accessibility 100 on Home (throttled, Playwright's Chromium) |
+| README and architecture updated with the three layouts and the route map                                                  | Done                                                                                                                                                                                                             |
+
+Not finished or worth knowing:
+
+- Lighthouse was measured locally with `lighthouse@12` against the production build; it is not in CI, and the score moves a few points between runs (83 to 92 seen) because the LCP is the hero heading waiting on the display font.
+- The basket is per browser (ADR 0004); paying calls the existing approve action per key.
+- `PersonRow` pausing uses an inline reason field rather than a dialog; import and "What's changed?" are dialogs as specified.
+- The category mega-menus open on hover and on the chevron button; there is no mega-menu on phones by design.
+- Dark theme derives from the same roles and passes the axe checks that run in light mode; it was not judged screen by screen.
+- New runtime dependency: `lucide-react` only. Dialogs, sheets and carousels are native `<dialog>` and CSS scroll-snap.
 
 ## Where it is
 

@@ -86,7 +86,7 @@ same roles.
 
 ## Screenshot checklist
 
-Captured by `pnpm screenshots` (Playwright) at 390×844 and 1440×900 into `docs/design/screens/`.
+Captured by `pnpm screenshots` (Playwright) at 390×844 and 1440×900 into `docs/design/screens/`, against a running `pnpm start:local`. All sixteen files are checked in; every check below was confirmed against them on 20 September 2026.
 
 | Screen      | File                     | Check                                                                                                                                                                                          |
 | ----------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

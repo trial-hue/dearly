@@ -10,6 +10,14 @@ What was cut or deferred to ship the pilot, in priority order, with the reason.
 4. **Word timings from the recording.** Narration timings are spaced evenly across the audio duration. Speech-to-text alignment would give exact per-word timings.
 5. **Business template rendering.** The `{first_name}` template is captured in the interface and shown as a preview; the per-card message is not yet stored on each scheduled row.
 
+## After the storefront rebuild (branch `ui/storefront`)
+
+6. **Basket and eCard status in the schema.** The basket is a per-browser list of proposal keys and an eCard-only send skips its source proposal (ADR 0004). A `Basket` table and a `fulfilled_by_ecard` proposal status are the first schema follow-ups.
+7. **Catalogue id on the card specification.** A chosen design is stored as the custom front SVG with its id embedded; a `catalogueDesignId` field would make it queryable.
+8. **Narration and animation on printed cards with a digital copy.** They come with eCard-only sends; the digital copy of a printed card has no digital card record to carry them.
+9. **Lighthouse performance headroom.** Home scores 92 on a throttled run with the LCP on the hero heading; trimming the home carousels or subsetting the display font would add margin.
+10. **Dark theme polish.** It derives from the same roles and works, but it was not judged screen by screen.
+
 ## Product questions surfaced while building
 
 - Noor Rahman's Eid (10 March 2027) is beyond the 150-day Later window at the plan date, so she appears under "Further ahead" on Today rather than in Later. Either extend the window or keep the extra list.
