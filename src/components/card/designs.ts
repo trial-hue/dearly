@@ -25,7 +25,7 @@ const GREEN = '#1B6B57';
 const PINK = '#E0708A';
 const NIGHT = '#1B2345';
 
-const UI_FONT = 'var(--font-ui), system-ui, sans-serif';
+const UI_FONT = 'var(--font-display), system-ui, sans-serif';
 const HAND_FONT = 'var(--font-hand), cursive';
 
 const frame = (bg = PAPER): Shape => ({

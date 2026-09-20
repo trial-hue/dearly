@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from 'next';
-import { Bricolage_Grotesque, Caveat } from 'next/font/google';
+import { Caveat, Plus_Jakarta_Sans } from 'next/font/google';
 
 import './globals.css';
 
-const ui = Bricolage_Grotesque({
+const ui = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  variable: '--font-ui',
+  variable: '--font-display',
   display: 'swap',
-  axes: ['opsz'],
+  weight: ['400', '500', '600', '700', '800'],
 });
 const hand = Caveat({
   subsets: ['latin'],
@@ -18,7 +18,7 @@ const hand = Caveat({
 
 export const metadata: Metadata = {
   title: { default: 'Dearly pilot', template: '%s · Dearly pilot' },
-  description: 'Greeting cards run by three people and an AI: the Dearly pilot.',
+  description: 'Cards that arrive on time, for everyone who matters to you.',
 };
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover' };
