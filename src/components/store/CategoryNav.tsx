@@ -110,7 +110,7 @@ export function CategoryNav({ categories }: { categories: Category[] }) {
       <ul className="container-x hidden items-center gap-1 py-1 md:flex">
         {categories.map((c, i) => (
           <MegaMenu
-            key={c.href}
+            key={c.label}
             category={c}
             open={openIdx === i}
             onOpen={() => setOpenIdx(i)}
@@ -120,7 +120,7 @@ export function CategoryNav({ categories }: { categories: Category[] }) {
       </ul>
       <ul className="scroll-x container-x py-2 md:hidden" style={{ gap: 8 }}>
         {categories.map((c) => (
-          <li key={c.href}>
+          <li key={c.label}>
             <Link
               href={c.href}
               className="chip"
