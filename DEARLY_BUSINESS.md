@@ -6,7 +6,7 @@ _A greeting-card company run by three people and an AI. This document is the bus
 
 ## 1. The idea in one paragraph
 
-People forget cards, or remember too late, or buy one and never post it. Moonpig's answer was to sell the card online and send a reminder email. Dearly's answer is to do the whole job: remember the person, draft the card, choose the size, finish and delivery, price it, and put it in front of the customer about three weeks ahead so that the only thing left to do is tap "Approve and pay". The card is sent early so that it arrives before the day, backed by a refund guarantee, and the recipient gets a page of their own that can turn them into the next customer. Because an AI does the drafting, choosing, reading and support work, the company that runs this is designed to need three people.
+People forget cards, or remember too late, or buy one and never post it. Moonpig's answer was to sell the card online and send a reminder that sends the customer off to choose one. Dearly reminds its customers too, by email, push and text; the difference is what the reminder contains. Dearly's answer is to do the whole job: remember the person, draft the card, choose the size, finish and delivery, price it, and put it in front of the customer about three weeks ahead so that the only thing left to do is tap "Approve and pay". The card is sent early so that it arrives before the day, backed by a refund guarantee, and the recipient gets a page of their own that can turn them into the next customer. Because an AI does the drafting, choosing, reading and support work, the company that runs this is designed to need three people.
 
 ## 2. The thesis, against the incumbent
 
@@ -15,12 +15,15 @@ Moonpig is the benchmark: a listed UK card business with published figures.
 | Area                 | What Moonpig runs                                                                                | What Dearly runs                                                                                                       |
 | -------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
 | Customers and orders | 12.3m customers, 36.0m orders (FY26)                                                             | A pilot account today; the same flows at any size                                                                      |
+| Reminders            | Reminder emails and app notifications that send the customer off to choose a card                | Reminders by email, push and text that arrive as a finished card proposal, approved with one tap                       |
 | Marketing            | £38.7m a year (FY26)                                                                             | Unpaid channels first: the card's own QR page, florist referrals, business accounts. Target under £5 a new customer    |
 | Data and engineering | 242 data scientists, analysts and engineers (FY24)                                               | One product and AI engineer; the AI drafts, chooses, cleans, reads and answers                                         |
 | Production           | Own factories                                                                                    | Partner printers routed by postcode, with a specialist for Luxe and Giant. Six simulated printers in the pilot         |
 | Customer care        | An AI assistant around the clock; human agents 9am to 5:30pm; no phone line listed               | An AI agent around the clock that can act (refund, reprint, upgrade, eCard), escalating to one person; voice to follow |
 | Card stock           | 250 to 300gsm                                                                                    | Three finishes from 300gsm to 400gsm, three sizes up to A3                                                             |
 | Team                 | Several hundred people (third-party estimates of about 600 to 670; confirm in the annual report) | Three: product and AI; operations and partners; growth and care                                                        |
+
+Both companies remind their customers. Dearly's reminder is the finished card.
 
 Sources: Moonpig Group plc annual reports (FY26 for customers, orders and marketing; FY24 for data and technology staff) and Moonpig help pages. Headcount is a third-party estimate and must be replaced with the figure in the staff note of Moonpig's annual report. Dearly figures are pilot assumptions.
 
@@ -39,7 +42,7 @@ Sources: Moonpig Group plc annual reports (FY26 for customers, orders and market
 
 ## 4. Every edge over Moonpig
 
-1. **One-tap proposals**, not reminder emails: the card is drafted, chosen and priced before the customer looks.
+1. **Reminders that arrive as the finished card**: both companies remind; Moonpig's reminder sends the customer off to choose a card, Dearly's is the drafted, chosen and priced proposal, approved with one tap.
 2. **The life-event guard**: a paused person never gets a card, at proposal time or at print time.
 3. **Advance post**: £4.94 for a Regular Signature card delivered against Moonpig's £5.89, shown side by side, and cheaper postage for Dearly.
 4. **A delivery guarantee with automatic recovery** on advance and tracked orders: refund, eCard, reprint and a next-card code without a support ticket.

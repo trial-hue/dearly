@@ -4,7 +4,7 @@ Greeting cards run by three people and an AI. This repository is the Dearly pilo
 
 The pilot shows three things:
 
-1. Every edge over Moonpig: one-tap AI proposals, the life-event guard, advance post with a price comparison, the delivery guarantee with automatic recovery, same-day pick-up, the AI help agent, three finishes in three sizes, the QR recipient loop, the Inventory, business sends and florist referrals.
+1. Every edge over Moonpig: reminders that arrive as a finished card proposal approved with one tap (Moonpig's reminders send the customer off to choose a card), the life-event guard, advance post with a price comparison, the delivery guarantee with automatic recovery, same-day pick-up, the AI help agent, three finishes in three sizes, the QR recipient loop, the Inventory, business sends and florist referrals.
 2. The AI doing operating work: importing people, drafting messages, choosing options, cleaning staff lists, reading florist orders, detecting life events, answering support.
 3. The thesis: an Operations screen with three roles, an automation log, a forecast and unit economics.
 

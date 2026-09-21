@@ -19,6 +19,11 @@ const THESIS: [string, string, string][] = [
     'A pilot account today; the same flows at any size',
   ],
   [
+    'Reminders',
+    'Reminder emails and app notifications that send the customer off to choose a card',
+    'Reminders by email, push and text that arrive as a finished card proposal, approved with one tap',
+  ],
+  [
     'Marketing',
     '£38.7m a year (FY26)',
     'Recipients join from the QR loop and florist referrals at no acquisition cost',
@@ -107,6 +112,9 @@ export default async function OperationsPage() {
           </tbody>
         </table>
       </div>
+      <p className="muted mt-1 text-xs" data-testid="thesis-reminders">
+        Both companies remind their customers. Dearly&rsquo;s reminder is the finished card.
+      </p>
       <p className="muted mt-1 text-xs" data-testid="thesis-footnote">
         Sources: Moonpig Group plc annual report FY26 (customers, orders, marketing spend) and FY24
         (data and technology staff), and Moonpig help pages (customer care hours, card stock).
