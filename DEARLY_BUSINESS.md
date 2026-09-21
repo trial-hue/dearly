@@ -1,166 +1,399 @@
-# Dearly: the business
+# Dearly: commercial business plan
 
-_A greeting-card company run by three people and an AI. This document is the business model as the pilot implements it: the product, the economics, the growth loops and the operating model. Every Dearly figure below is the one the application runs on, and every one is a pilot assumption until a supplier quote or a live customer replaces it. The technical detail is in `DEARLY_TECHNICAL.md`. Market size, competition, funding, milestones and legal points are in the commercial business plan._
+20 September 2026
 
----
+## Summary and thesis
 
-## 1. The idea in one paragraph
+Dearly is an AI-run greeting card service that gets a better card to the recipient early, backed by a delivery guarantee, and is operated by two or three people.
 
-People forget cards, or remember too late, or buy one and never post it. Moonpig's answer was to sell the card online and send a reminder that sends the customer off to choose one. Dearly reminds its customers too, by email, push and text; the difference is what the reminder contains. Dearly's answer is to do the whole job: remember the person, draft the card, choose the size, finish and delivery, price it, and put it in front of the customer about three weeks ahead so that the only thing left to do is tap "Approve and pay". The card is sent early so that it arrives before the day, backed by a refund guarantee, and the recipient gets a page of their own that can turn them into the next customer. Because an AI does the drafting, choosing, reading and support work, the company that runs this is designed to need three people.
+The thesis is that large consumer businesses carry cost that AI can now remove. Moonpig is the first target. It serves 12.3m customers and 36.0m orders a year ([FY26 results](https://www.investegate.co.uk/announcement/rns/moonpig-group--moon/final-results/9635380)), spends £38.7m a year on marketing ([Marketing Week](https://www.marketingweek.com/moonpig-doubles-down-marketing-revenue/)), owns its factories, and had 242 data scientists, analysts and engineers in FY24 ([FY24 annual report](https://www.moonpig.group/media/guimundu/moonpig-ara24-full-strategic-report.pdf)).
 
-## 2. The thesis, against the incumbent
+Dearly replaces each of those with software and partners:
 
-Moonpig is the benchmark: a listed UK card business with published figures.
+| Moonpig runs                                                                      | Dearly runs                                                                                      |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Reminder emails and app notifications that send the customer off to choose a card | Reminders by email, push and text that arrive as a finished card proposal, approved with one tap |
+| Its own factories, sized for peak demand                                          | Qualified partner printers, routed by software                                                   |
+| Next-day post as the default                                                      | Post sent in advance, tracked only when needed                                                   |
+| Human support from 9am to 5:30pm, no phone line                                   | An AI agent at all hours with a fixed list of actions                                            |
+| £38.7m a year of marketing                                                        | Business accounts, recipients, florists and pick-up partners                                     |
 
-| Area                 | What Moonpig runs                                                                                | What Dearly runs                                                                                                       |
-| -------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| Customers and orders | 12.3m customers, 36.0m orders (FY26)                                                             | A pilot account today; the same flows at any size                                                                      |
-| Reminders            | Reminder emails and app notifications that send the customer off to choose a card                | Reminders by email, push and text that arrive as a finished card proposal, approved with one tap                       |
-| Marketing            | £38.7m a year (FY26)                                                                             | Unpaid channels first: the card's own QR page, florist referrals, business accounts. Target under £5 a new customer    |
-| Data and engineering | 242 data scientists, analysts and engineers (FY24)                                               | One product and AI engineer; the AI drafts, chooses, cleans, reads and answers                                         |
-| Production           | Own factories                                                                                    | Partner printers routed by postcode, with a specialist for Luxe and Giant. Six simulated printers in the pilot         |
-| Customer care        | An AI assistant around the clock; human agents 9am to 5:30pm; no phone line listed               | An AI agent around the clock that can act (refund, reprint, upgrade, eCard), escalating to one person; voice to follow |
-| Card stock           | 250 to 300gsm                                                                                    | Three finishes from 300gsm to 400gsm, three sizes up to A3                                                             |
-| Team                 | Several hundred people (third-party estimates of about 600 to 670; confirm in the annual report) | Three: product and AI; operations and partners; growth and care                                                        |
+All Dearly figures in this plan are estimates or proposed starting points. Moonpig figures come from its published reports and help pages.
 
-Both companies remind their customers. Dearly's reminder is the finished card.
+## How customers are reminded
 
-Sources: Moonpig Group plc annual reports (FY26 for customers, orders and marketing; FY24 for data and technology staff) and Moonpig help pages. Headcount is a third-party estimate and must be replaced with the figure in the staff note of Moonpig's annual report. Dearly figures are pilot assumptions.
+The whole model depends on the proposal reaching the customer: no reminder, no early approval, no advance post, no margin. Reminder delivery is therefore a core system, not a marketing add-on.
 
-## 3. What the customer experiences
+Moonpig takes about 40% of its orders within a week of a reminder. Dearly's claim is that a finished proposal converts better than a bare reminder, and that claim can only be tested if the message arrives and is opened.
 
-**Set up once.** Add the people who matter, with their occasions and addresses. Paste a list, type a line, or arrive from a florist's order confirmation (section 6). An address is checked once a year; a card is never sent to a stale one.
+### Channels
 
-**Then, every occasion:**
+| Channel                                  | Role                                                                                                                        | Status                                             |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| Email                                    | The main channel. Shows the proposed card, the date, the arrival promise, the full price and one button: Review and approve | From the first day                                 |
+| Push notification                        | Same message on the phone                                                                                                   | When there is an installable web app or native app |
+| SMS or WhatsApp                          | The last nudge and urgent cases only                                                                                        | Opt-in; a few pence a message                      |
+| Calendar feed                            | The customer's dates appear in their own calendar with a link back                                                          | Later                                              |
+| Monthly digest to the HR or office admin | Business accounts: cards scheduled next month, approve or edit                                                              | From the first business pilot                      |
 
-1. **About three weeks ahead a card is ready.** Proposals are created 21 days before the occasion, and the Reminders screen looks 35 days ahead. Dearly has chosen the design, written the message in the customer's voice, picked the size and finish that fit the relationship and the moment (a mother's 60th gets Large, Luxe and flowers; a colleague's leaving card is Regular Classic), chosen how it travels, and priced it, delivery included.
-2. **One tap approves and pays.** Or the customer edits anything: the front (49 designs, their own photo, a child's drawing, an AI-drawn front), the words, handwriting from a photo, a gift, a digital copy with their voice reading the message, or the date.
-3. **It arrives before the day.** Cards seven or more days out go by advance post, sent early and promised two days before the occasion. Two to six days out: tracked, next day, promised the day before. Under two days: printed at a partner shop near the sender, who collects it within two hours and hands it over in person (Regular Classic or Signature only). Giant cards always travel tracked.
-4. **If the post lets them down, Dearly acts before they have to ask.** On advance and tracked orders, a card that will miss its promised date triggers an eCard on the morning of the day, a full refund, a single-use code for half off the next card, and a tracked reprint when there is still time. Pick-up orders and eCards are not covered by the guarantee.
-5. **The recipient gets a page of their own.** The card carries a QR code. The page shows the card and the message, plays the narration if one was bought, and offers three things: rate it, save it to their own Dearly, and send one back. Saving creates their account, with no media spend behind it.
-6. **Life happens, cards stop.** One sentence, "Uncle Peter passed away in June", proposes pausing every card for that person; the customer confirms, and nothing goes out, not even a card already in the pipeline.
+### Cadence
 
-## 4. Every edge over Moonpig
+| Days before the occasion | Message                                          |
+| ------------------------ | ------------------------------------------------ |
+| 21                       | The proposal                                     |
+| 14                       | A reminder that includes the advance-post saving |
+| 7                        | Last day for advance post                        |
+| 3                        | Tracked is still possible                        |
+| 1 or 0                   | Pick-up or eCard today                           |
 
-1. **Reminders that arrive as the finished card**: both companies remind; Moonpig's reminder sends the customer off to choose a card, Dearly's is the drafted, chosen and priced proposal, approved with one tap.
-2. **The life-event guard**: a paused person never gets a card, at proposal time or at print time.
-3. **Advance post**: £4.94 for a Regular Signature card delivered against Moonpig's £5.89, shown side by side, and cheaper postage for Dearly.
-4. **A delivery guarantee with automatic recovery** on advance and tracked orders: refund, eCard, reprint and a next-card code without a support ticket.
-5. **Same-day pick-up** from a partner shop, which Moonpig does not offer today.
-6. **An AI help agent that acts** (refund, reprint, upgrade, eCard, escalate) within strict rules, around the clock. Moonpig's assistant answers questions; its human agents work office hours.
-7. **Three finishes in three sizes**, Classic to Luxe, Regular to A3, with every design in every size.
-8. **The QR recipient loop**: every printed card invites its recipient to join.
-9. **The Inventory**: sent and received cards kept for three years, downloadable, with a warning before they expire.
-10. **Business sends**: a staff list pasted in any state becomes a year of birthday, work-anniversary and leaving cards.
-11. **Florist referrals**: a customer's flower order becomes next year's reminder.
-    Moonpig can copy several of these. The ones that are hardest to copy are the proposal engine with the life-event guard, the automatic recovery, the recipient Inventory and the business integrations.
+Messages stop as soon as the customer approves or skips. Autopilot customers get one notice saying what will be sent and when, with a way to change it.
 
-## 5. Pricing and unit economics
+### Rules
 
-### 5.1 Prices (including VAT)
+- The button in a message never approves an order by itself, because security scanners open links automatically. It opens a confirm screen with one Approve and pay button. Links are signed, single-purpose and expiring.
+- Paused people never trigger a message. Nothing sensitive goes in a subject line.
+- Reminders the customer asked for are service messages. Offers are marketing and need separate consent. This needs legal review.
+- Every message shows the same full price the app shows, taken from the same pricing function.
+- Customers choose channels and quiet hours, and can stop marketing while keeping reminders.
+- The sending domain is authenticated and warmed up before launch, and inbox placement is monitored.
 
-| Size    | Classic | Signature | Luxe   |
-| ------- | ------- | --------- | ------ |
-| Regular | £2.99   | £3.99     | £6.49  |
-| Large   | £4.99   | £6.49     | £8.99  |
-| Giant   | £9.99   | £11.99    | £14.99 |
+### Cost and measures
 
-Delivery: advance post £0.95 (Regular) or £1.95 (Large); tracked £2.75, £3.75 or £3.99 (Giant); pick-up £1.95 (Regular Classic or Signature only). A digital copy of a printed card £0.29; a standalone eCard £0.79. Gifts: flowers £24.00, chocolates £14.00, fizz £19.00, a plant £22.00.
+A full sequence costs roughly 1p to 5p an order (estimate, unverified), inside the service cost already in the unit economics. The measures are delivery rate, open rate, and reminder-to-order rate at each step of the cadence.
 
-### 5.2 What each card contributes
+## Market and the opening
 
-Every order pays its print cost, delivery cost, payment fee (1.5% plus £0.20), AI (£0.05), service (£0.08) and, on guaranteed modes, a £0.10 reserve for recovery. What is left after VAT is the contribution towards the team.
+Moonpig holds about 70% of UK online single cards, but only 6% of UK card volume is bought online ([Moonpig FY25 at a glance](https://www.moonpig.group/media/exrfm4jc/at-a-glance-fy25-moonpig-group-plc.pdf)). The opening is the occasions Moonpig's own customers do not use it for.
 
-| Card, mode                                | Price                    | Contribution          |
-| ----------------------------------------- | ------------------------ | --------------------- |
-| Regular Classic, advance post             | £3.94                    | £1.24                 |
-| Regular Signature, advance post           | £4.94                    | £1.93                 |
-| Regular Luxe, advance post                | £7.44                    | £3.33                 |
-| Regular Signature, tracked                | £6.74                    | £1.99                 |
-| Regular Signature, pick-up                | £5.94                    | £2.53                 |
-| Regular Classic, pick-up                  | £4.94                    | £1.71                 |
-| Regular Signature, advance + digital copy | £5.23                    | £2.17                 |
-| Regular Signature, advance + flowers      | £28.94                   | £9.17                 |
-| Large Classic / Signature / Luxe, advance | £6.94 / £8.44 / £10.94   | £2.48 / £3.48 / £4.67 |
-| Giant Classic / Signature / Luxe, tracked | £13.98 / £15.98 / £18.98 | £4.16 / £5.50 / £7.15 |
-| Standalone eCard                          | £0.79                    | £0.32                 |
+A Moonpig customer orders about three times a year, and a typical UK buyer sends about 19 cards. Moonpig holds 113m saved reminder dates and takes 36.0m orders. About 40% of orders follow a reminder, so roughly 13% of reminders convert (estimate).
 
-Pick-up contributes more than the same Classic or Signature card sent by post (£2.53 against £1.93 for Signature), because the partner shop is paid £1.75 plus £0.25 of stock and there is no postage and no guarantee reserve. Regular Luxe by advance post still contributes more, at £3.33.
+| Gap at Moonpig               | Evidence                                                                                                                   | Dearly's answer                                                                                                  |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Reminders rarely convert     | About 13% (estimate)                                                                                                       | Dearly also reminds by email, push and text, but each reminder carries a finished proposal to approve in one tap |
+| No reward for ordering early | Early orders still pay £1.90 first class ([delivery page](https://www.moonpig.com/uk/delivery-information/))               | Advance post at £0.95                                                                                            |
+| Weak late-delivery remedy    | One customer was offered only the delivery charge back                                                                     | Automatic refund, reprint and eCard                                                                              |
+| No same-day physical card    | Its same-day answer is an eCard                                                                                            | Pick-up from a partner shop                                                                                      |
+| Limited support              | Humans 9am to 5:30pm, no phone line ([contact page](https://help.moonpig.com/en/articles/318764-contact-customer-service)) | AI agent at all hours                                                                                            |
+| Card stock                   | 250 to 300gsm ([sizes page](https://help.moonpig.com/en/articles/318238-what-size-are-your-cards))                         | 300, 350 and 400gsm finishes                                                                                     |
+| Business sending is new      | Platform launched late 2025 ([Moonpig for Business](https://www.moonpig.com/uk/business/))                                 | HR sync, office drops, invoicing                                                                                 |
+| Recipients are not recruited | No recipient account or archive found                                                                                      | QR code, Inventory, send-back prompts                                                                            |
 
-Three cautions on this table. Print costs, the shop payout and postage costs are estimates, not supplier quotes. Creator royalties are not yet in the cost stack, and a per-card royalty will reduce every figure by that amount. The standalone eCard keeps only £0.32 because the fixed payment fee falls on a £0.79 sale; selling eCards in packs would raise that.
+Dearly does not attack Moonpig's strengths: its reminder database, its brand, its print scale, its 9pm next-day cut-off, or generic Google search terms.
 
-### 5.3 The company's break-even
+## Customers and segments
 
-With an assumed mix of 20% Classic, 60% Signature and 20% Luxe on Regular advance post, the blended contribution is **£2.07** a card. A team of three with its tools costs **£330,000** a year. The company breaks even at **about 159,000 orders a year**. At an assumed four cards per customer that is about 40,000 customers; at Moonpig's observed rate of about 2.9 orders per customer (36.0m orders across 12.3m customers) it is about 55,000. At 210,000 orders a year the team costs £1.57 per order. Every one of these inputs is editable on the Operations screen and recomputes the whole table.
+Dearly serves three groups, and each one feeds the next.
 
-This break-even covers the team only. It excludes customer acquisition spend, the cost of free first cards, florist referral fees, hosting and infrastructure, creator royalties, and recovery costs above the reserve. The commercial business plan carries those in its scenarios.
+| Segment           | Who                                                       | Why they buy                                    | Role in the model                             |
+| ----------------- | --------------------------------------------------------- | ----------------------------------------------- | --------------------------------------------- |
+| Business accounts | HR teams, office managers, client-facing teams            | Saves staff time, never misses a date, on-brand | Revenue without advertising; seeds recipients |
+| Recipients        | Employees, clients, friends and family who receive a card | They scan the QR code to keep or rate the card  | Free customer acquisition                     |
+| Consumers         | People who send cards to close family and friends         | Better card, arrives early, one tap             | Core repeat revenue                           |
 
-Postage is the other lever: each advance-post card saves about £0.89 against first class at public stamp prices (£1.80 against £0.91), because the card is sent early on purpose. The model depends on most customers approving early; if they still order at the last minute, the saving disappears.
+Community occasions widen the consumer base. The 2021 census counted 3.9m Muslims, 1.0m Hindus, 524,000 Sikhs and 271,000 Jews in England and Wales ([census summary](https://lawandreligionuk.com/2022/11/29/2021-census-for-england-wales-religious-affiliation/)). Dearly serves Eid, Diwali, Vaisakhi, Hanukkah and Women's Day with ranges made by designers from those communities.
 
-### 5.4 The guarantee, costed
+## Product
 
-A full recovery on a £4.94 card costs roughly £10: the £4.94 refund, a tracked reprint at about £3.10 (print £0.80 plus tracked delivery £2.30), and about £2.00 if the half-price code is redeemed. The £0.10 reserve per guaranteed card therefore holds at a failure rate of about 1%. At 2% it would need to be about £0.20. The failure rate is unknown until cards are posted for real, and it is the number to watch. The code halves the card price only, once; delivery is charged.
+The product is a relationship assistant: it knows the customer's people and dates, and proposes the right card about three weeks ahead.
 
-### 5.5 First card free
+### Consumer
 
-An account that adds at least three dates gets its first Regular Classic or Signature card free; delivery, extras and gifts are paid. The customer's first experience is the whole loop at low cost, and three dates mean three more proposals are already on their way. Each free card costs Dearly about £1.33 for Signature or £1.20 for Classic by advance post. That is an acquisition cost and is budgeted as one.
+- **Reminder list.** Customers import people and dates by pasting notes or syncing contacts. The AI sorts them into relationships and occasions.
+- **Proposals.** Each proposal has a design, a message in the sender's voice, a size, a finish, an optional gift and a delivery mode. The customer approves, edits or skips. Payment is taken on approval. Each proposal reaches the customer by email, with push and text as opt-in extras, and links to a confirm screen.
+- **Life-event guard.** Proposals pause after a bereavement, a break-up or an unconfirmed address. This is the most important safety feature.
+- **Card editor.** Photo quality check, handwriting by photo, a handwritten signature, a child's drawing as the card front, and AI-personalised card fronts labelled as AI-made.
+- **Rich eCards.** Text and fonts, a drawing canvas, animated templates, voice and video messages, and export as a short video that plays inside messaging apps.
+- **Narration.** The sender reads the message aloud. The recipient hears it while the words appear in time with the voice. It plays in eCards, in the exported video, and from the QR code in a printed card. Launch with the sender's own recording; a stock synthetic voice is the fallback. Never clone another person's voice.
+- **QR code on every printed card.** It opens a page where the recipient rates the card, saves it and is prompted to send one back.
+- **Inventory.** Account holders see three years of sent and received cards and can download them.
+- **Guarantee.** A full refund and a discount on the next card if an advance or tracked order misses its date, paid automatically from tracking data.
+- **Help.** An AI voice and chat agent that can refund, reprint, upgrade delivery or send an eCard, and hands distressed callers to a person.
 
-## 6. Growth through unpaid channels first
+### Business
 
-None of these channels needs media spend, but none is free, and their conversion rates are unproven. The planning target is under £5 to acquire a customer, against an estimated £6 to £23 for a first order won through Google.
+- Staff list upload or HR-system sync, cleaned by the AI.
+- Automatic scheduling of birthdays, work anniversaries and client dates.
+- Office batch drop or post to home.
+- Giant group cards with signatures collected online.
+- Brand kit, on-brand AI card sets, approvals, invoicing and reporting.
+  Moonpig already offers handwriting upload and an AI handwriting font ([handwriting page](https://www.moonpig.com/uk/handwriting/)), and links video messages to printed cards. Dearly's edge is in signatures, children's drawings, group signing, narration and the recipient archive.
 
-**The recipient loop.** Every printed card carries a QR code to a page made for the recipient. Rate it (which tunes the printer network), save it (which creates their account, with no marketing consent unless they give it), send one back (which creates a thank-you reminder a week out). No media spend is involved. The share of recipients who save a card is an assumption (10% in the plan) until a live pilot measures it. The pilot counts recipients joined on the Operations screen.
+## Range and pricing
 
-**Florists.** After a flower checkout, the florist shows its customer a Dearly link: "Want this date remembered next year? First card free." The customer opts in on Dearly and can paste or forward their own order confirmation. Dearly reads the occasion, the relationship and the date, and nothing is saved until the customer confirms the reading. The florist never hands over customer data. Dearly pays the florist **£1.50** for each new account. Next year Dearly's proposal includes flowers from the same florist, the florist gets a repeat order it would not otherwise have had, and Dearly earns **7%** of the basket (£2.45 on a £35.00 bouquet).
+Every design is sold in three sizes and three finishes, with Regular and Signature preselected so most buyers land on the middle option.
 
-**Business.** A company pastes its staff list, in whatever state it is in. Dearly cleans it (with AI or with strict rules), flags the rows it cannot use, and schedules a year of birthday, work-anniversary and leaving cards, posted to homes or dropped at the office in one batch. Prices, excluding VAT and including delivery: **£3.30** a posted card, £3.10 from 250 a year, £2.80 from 2,000; office drop **£2.30** flat. Every business account gets its first 25 cards free as a trial. The optional **Automate** plan costs £49.00 a month for HR sync, approvals, a brand kit and reporting. Moonpig's listed business price is £3.60. Contribution per card: £1.36 posted, £1.16 and £0.86 at the tiers, £1.07 by office drop; a 600-card posted batch invoices £1,860.00 and contributes £695.40. Business accounts come first in the go-to-market plan because they bring revenue without advertising and put cards in front of employees and clients.
+### Card prices (including VAT)
 
-## 7. Seasonality
+| Size       | Classic, 300gsm | Signature, 350gsm (default) | Luxe, 400gsm textured |
+| ---------- | --------------- | --------------------------- | --------------------- |
+| Regular    | £2.99           | £3.99                       | £6.49                 |
+| Large (A4) | £4.99           | £6.49                       | £8.99                 |
+| Giant (A3) | £9.99           | £11.99                      | £14.99                |
 
-The forecast assumes four orders per customer per year, 72% by advance post, 20% tracked, 8% pick-up, with three peaks: Christmas ordering (24 November to 14 December, ×2.6), Valentine week (×1.8) and the week before Mother's Day (×2.4). These multipliers are planning assumptions. The Operations screen shows 13 weeks for any number of customers from 500 to 100,000.
+Every card ships in a board-backed mailer. Customers choose size first and finish second, and see the full price including delivery before paying. Moonpig charges £3.99 for a standard card; its Large and Giant prices still need checking.
 
-## 8. The operating model: three people
+### Delivery (proposed)
 
-| Role                    | Owns                                                    | What the AI does for them                                                                                                                        |
-| ----------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Product and AI engineer | The product, the prompts, the gateway                   | Drafts every message and chooses every option; draws card fronts and checks photos; reads what customers paste and tell it                       |
-| Operations and partners | Printers, pick-up shops, florists, business accounts    | Routes every order by postcode and score; cleans staff lists; reads florist orders; plans recovery when the post is late                         |
-| Growth and care         | The recipient loop, referrals, the one escalation queue | Answers support around the clock within six allowed actions; refunds only late or damaged orders; escalates bereavement and distress to a person |
+| Mode                                   | Regular | Large       | Giant       | Guarantee |
+| -------------------------------------- | ------- | ----------- | ----------- | --------- |
+| Advance post, second class, sent early | £0.95   | £1.95       | Not offered | Yes       |
+| Tracked, next day                      | £2.75   | £3.75       | £3.99       | Yes       |
+| Pick-up, ready in two hours            | Free    | Not offered | Not offered | No        |
 
-Every automated step is written to a decision log with its actor: the AI, a rule, or a person. The Operations screen shows the counts, the latest decisions, and the estimated AI cost, so the claim "the AI does the operating work" is auditable, not asserted. Every AI job also has a rules-based fallback, so the business runs, more plainly, with no AI provider at all.
+A Regular Signature card by advance post costs £4.94. Moonpig's standard card with first-class post costs £5.89.
 
-Guardrails the model cannot cross: prompts never carry an address, postcode, email, phone number or surname; every AI answer is validated against a schema and a list of allowed values before it touches anything; unsafe or oversized card art is discarded; the support agent can only refund a late or damaged order; a life event is a proposal until the customer confirms it.
+### Digital
 
-## 9. What the pilot demonstrates today
+- Standalone eCard: £0.79, sold singly or in credit packs.
+- Digital copy bought with a printed card: £0.29.
+- Both include fonts, drawing, animation, narration, voice and video.
+- Recommendation: every printed card's QR code still opens a free rating and sign-up page. The £0.29 upgrades it to the full saved copy. Otherwise only paying senders' recipients can join.
 
-The application in this repository runs every flow above with real AI calls (when a key is configured) and simulated partners for payments, printing, postage, tracking and messaging, each labelled as such. A conformance suite (`docs/conformance/`) maps 61 business claims and nine end-to-end journeys to automated tests at the lowest layer that can prove them, and runs them with the mock provider and again with no provider. At the time of writing every claim passes; 18 disagreements between the app and this model were found and fixed on the way, and are recorded with their severity.
+### Business (before VAT, Signature Regular)
 
-That proves the software matches the model. It does not prove the model works in the market: the pilot has had no paying customers, no real printers and no real post.
+| Option                                                  | Price                 |
+| ------------------------------------------------------- | --------------------- |
+| Posted to home, second class in advance                 | £3.30 a card          |
+| Office batch drop                                       | £2.30 a card          |
+| From 250 cards a year                                   | £3.10 a card          |
+| From 2,000 cards a year                                 | £2.80 a card          |
+| Automate plan: HR sync, approvals, brand kit, reporting | £49 a month, optional |
+| Trial                                                   | First 25 cards free   |
 
-Figures the app reproduces: a Regular Signature card by advance post at £4.94 against Moonpig's £5.89; Sam's leaving card by pick-up at £4.94, ready today within two hours; Bill's tracked card at £6.74; a blended contribution of £2.07 and a break-even of about 159,000 orders on the Operations screen.
+Moonpig lists £3.60 a card including postage for business customers ([Moonpig for Business](https://www.moonpig.com/uk/business/)).
 
-## 10. What is next
+### Offers
 
-1. **Real partners behind the same interfaces**: Stripe for payments, one print API in one city, Royal Mail Click and Drop for labels, a pick-up shop. The adapters exist; the simulators are swapped one at a time behind feature flags.
-2. **Hosting**: a managed PostgreSQL, a storage bucket for uploads and a scheduled job runner; the container image already runs migrations and health checks.
-3. **A live pilot** with a few hundred customers through the business, florist and recipient channels, to replace the pilot assumptions (contribution mix, advance-post share, pick-up uptake, recovery rate, recipient sign-up rate, orders per customer) with observed ones. The Operations screen is built to be updated from data rather than from a plan.
-4. **Real accounts** for recipients who save a card, so that the loop closes in the browser as it already does in the database.
-5. **Supplier quotes** for printing, mailers, the pick-up payout and a Royal Mail business account, so that the cost table rests on quotes and not on estimates.
+- First card free on sign-up: the customer pays postage and adds three to five reminder dates.
+- Seasonal and community offers go to new customers only. No blanket peak discounts.
 
-## 11. Risks and how the pilot treats them
+## Go-to-market
 
-| Risk                                       | Mitigation in the product                                                                                                        |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| The AI writes something wrong or unsafe    | Schema validation, allowed-value lists, sanitising, and a rules fallback for every job; nothing reaches a customer unvalidated   |
-| The post is late                           | The guarantee bundle is automatic; the £0.10 reserve holds at about a 1% failure rate and is editable on Operations              |
-| A card lands after a bereavement           | The life-event guard pauses the person at proposal time and holds anything already in the pipeline                               |
-| Prices drift between plan, code and screen | One constants file; the price book is generated from it; a test fails on any stray price literal                                 |
-| Personal data reaches the model            | Prompts are built from a whitelisted view; a test asserts every prompt is free of addresses and surnames                         |
-| Volume and cost assumptions are wrong      | Every economic input is editable on Operations and the break-even recomputes live; supplier quotes replace estimates first       |
-| Customers still order at the last minute   | Advance-post share is tracked on Operations; without it the postage saving and much of the margin go                             |
-| Pick-up is hard to run                     | Print shops close early, volumes per shop are low and quality varies; pilot in one city with Dearly's stock before relying on it |
-| Moonpig or Card Factory copies features    | Price is a tactic, not the moat; the reminder list, the Inventory and business integrations are the assets to build              |
+Dearly wins customers through channels that do not depend on paid clicks, because a first order won through Google costs £6 to £23 (estimate) and earns about £2.
 
-## 12. Assumptions still to validate
+1. **Business accounts first.** They bring revenue with no advertising spend. Every card lands with an employee or client who can become a consumer customer. Sell on reliability, integration and saved staff time, and only slightly under Moonpig on price.
+2. **Recipient loop.** Each printed card carries a QR code. The recipient rates the card, saves it to an Inventory and is prompted to send one back. Each account costs nothing to acquire and adds a birthday and a relationship.
+3. **Florists send customers to Dearly.** After a flower checkout, the florist shows an offer: Dearly remembers the date, first card free. The next year Dearly proposes flowers from the same florist, so value flows both ways. UK flower search volume is down 7.3% since 2022 ([Salience report](https://salience.co.uk/report/florist-retailers-market-performance-report)), so florists need repeat customers. Target mid-sized online florists and networks of independent shops.
+4. **Pick-up partners.** Local print shops and florists act as same-day collection points. Pilot in one city.
+5. **Conditional free first card.** It raises conversion on every other channel and fills the reminder list.
+6. **Paid search.** Kept small, and grown only when payback within 12 months is proven.
+   Target acquisition cost is under £5 a customer (estimate). Florist referral fees of £1 to £2 can be offset by commission of 6% to 8% on repeat flower orders Dearly sends back.
 
-These inputs drive the numbers above and have not been tested with a supplier or a customer: print costs by size and finish; the £1.75 pick-up payout; second-class and tracked postage at business rates; the 20/60/20 finish mix; four orders per customer a year; 72% of orders by advance post; a 1% delivery failure rate; a 10% recipient sign-up rate; the florist opt-in rate; creator royalties; and an acquisition cost under £5. The commercial business plan lists how each will be validated, along with the market, the competition, the funding requirement, the milestones and the legal points (consent for automated orders, recipient data, user content, voice recordings and design licences).
+## Operations and quality
+
+Dearly owns no factory. Orders go to qualified partner printers, and most cards are printed and posted days ahead, so the business needs no next-day production line.
+
+```mermaid
+flowchart TD
+  A[Approved order] --> B[Life-event and content checks]
+  B --> C{Delivery mode}
+  C --> D[Advance post]
+  C --> E[Tracked]
+  C --> F[Pick-up]
+  D --> G[Printer routing]
+  E --> G
+  F --> G
+  G --> H[Print inspection<br/>and QR envelope match]
+  H --> I[Delivery monitoring]
+  I --> J[On time: recipient rates]
+  I --> K[Late: reprint, eCard, refund]
+  J --> L[Inventory and send-back prompt]
+  K --> L
+```
+
+The AI chooses the delivery mode from the days left, the card size and the postcode's delivery record.
+
+### Delivery
+
+- Target: 70% of orders by advance post. Second class costs 91p against £1.80 for first class ([Royal Mail rates](https://www.mailcoms.co.uk/current-royal-mail-postage-rates/)).
+- Royal Mail's targets are 90% of first class next day and 95% of second class within three days. A five-to-ten-day buffer removes almost all lateness.
+- Tracked post covers urgent orders and all Giant cards. Pick-up covers same-day needs.
+- Consolidation: two cards to one address share an envelope; business cards go in office batch drops.
+
+### Quality system
+
+1. One written specification for every printer: board, varnish, creasing, envelope, board-backed mailer.
+2. Each printer is qualified with a standard test sheet before taking orders. One specialist prints Luxe and Giant.
+3. Customer photos are checked for resolution and cropping before printing.
+4. Every card is photographed at packing. The AI compares it with the intended image, and the QR code confirms the card matches its envelope.
+5. Recipients rate the card from the QR page. Scores feed a scorecard per printer, and routing favours the better ones.
+6. Free reprint on any quality complaint. Target under 1% reprints.
+7. Pick-up shops must use Dearly's stock on a qualified printer.
+
+### Planning
+
+The reminder list is the demand forecast. Dearly shares a 13-week rolling forecast with printers and carriers, prints peak-season cards ahead at a steady rate, and pays customers a small discount to confirm early when that saves more in postage.
+
+## Designs and content supply
+
+Dearly launches with about 150 commissioned designs and an open creator marketplace, with customer content and AI personalisation layered on top.
+
+| Source                       | Use                                                                         | Cost model                                                                                                                                     |
+| ---------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Commissioned core collection | Defines Dearly's look; community ranges by designers from those communities | Flat fee or advance; roughly £15,000 to £40,000 in total (estimate)                                                                            |
+| Creator marketplace          | Breadth without a design team                                               | Per-card royalty; creators keep copyright                                                                                                      |
+| Licensed publisher ranges    | Proven sellers, added later                                                 | Licence fee plus 3% to 8% of trade price ([Writers & Artists](https://www.writersandartists.co.uk/advice/illustrating-greeting-card-industry)) |
+| Customer content             | Photos, handwriting, children's drawings                                    | Free                                                                                                                                           |
+| AI personalisation           | One-off fronts, on-brand business sets                                      | A few pence per image (unverified)                                                                                                             |
+| Public-domain art            | A classic-art range                                                         | Free; check each licence                                                                                                                       |
+
+Thortful built its range from independent creators and says it has paid them more than £12m in royalties ([Retail Times](https://retailtimes.co.uk/thortful-creates-12-million-in-royalties-for-its-community-of-creators/)).
+
+Rules: AI-made designs are labelled. An artist's style is copied only with consent and a revenue share. Contracts must cover all sizes and finishes, animation, the digital copy, the Inventory and personal downloads. AI screens uploads for copied characters, logos and offensive content, and a person approves.
+
+## Team and operating model
+
+Three people run Dearly, and each owns decisions the AI is not allowed to make.
+
+| Role                     | Owns                                                      | The AI does                                                                                            |
+| ------------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Product and AI engineer  | The app, the models, the data, security                   | Proposals, moderation, routing, forecasting, list clean-up                                             |
+| Operations and partners  | Printers, carriers, quality, florist and pick-up partners | Print inspection, delivery monitoring, scorecards, recovery                                            |
+| Growth and customer care | Business sales, partnerships, escalations, brand          | Reminder and recovery messages, voice and chat agent, ad creative, outreach drafts, royalty statements |
+
+### Guardrails
+
+- A person approves anything that spends a customer's money or contacts someone for the first time.
+- The AI acts only from a fixed list of actions. It cannot invent promises.
+- Every automated decision is logged and can be reviewed.
+- Customers can switch any automation off.
+- Bereavement, distress and legal complaints always go to a person.
+  The measure of the thesis is orders per team member. Moonpig's overhead excluding marketing is about £1.57 an order (estimate). Dearly matches that at about 210,000 orders a year and falls below it as volume grows.
+
+## Unit economics
+
+A Regular card-only order contributes about £1.35 to £3.40 before marketing, and about £2.15 on the expected mix of finishes. All figures are estimates.
+
+| Per Regular card by advance post    | Classic     | Signature   | Luxe        |
+| ----------------------------------- | ----------- | ----------- | ----------- |
+| Customer pays, card plus £0.95 post | £3.94       | £4.94       | £7.44       |
+| Revenue after VAT                   | £3.28       | £4.12       | £6.20       |
+| Print, envelope and mailer          | £0.67       | £0.80       | £1.45       |
+| Second-class postage                | £0.88       | £0.88       | £0.88       |
+| Payment fee at list rates           | £0.26       | £0.27       | £0.31       |
+| Guarantee, AI and service           | £0.18       | £0.18       | £0.18       |
+| Contribution                        | about £1.30 | about £2.00 | about £3.40 |
+
+Payment fees assume Stripe's UK list rate of 1.5% plus 20p ([Wise summary](https://wise.com/gb/blog/Stripe-payments-charges-uk)).
+
+- **Mix.** If 20% choose Classic, 60% Signature and 20% Luxe, blended contribution is about £2.15.
+- **Larger cards.** A Large Signature card contributes roughly £3 and a Giant roughly £5. Both depend on print quotes and a postage tariff not yet checked.
+- **Gifts.** An attached gift roughly triples the contribution of an order.
+- **Business cards.** About £1.50 to £1.80 posted and £1.25 to £1.55 by office drop.
+- **Digital.** A standalone eCard leaves roughly 55p to 60p when sold through credit packs. The £0.29 paired copy is almost all margin.
+- **AI running cost.** About 3p to 8p an order, including the voice agent.
+- **Reminder messages.** Roughly 1p to 5p an order for the full email sequence plus an occasional text (estimate, unverified). This sits inside the 8p service cost.
+- **Moonpig comparison.** Moonpig keeps about £3.70 on a card-only order (estimate). Dearly is worse on print cost and better on postage and fixed cost.
+
+## Financial scenarios and funding
+
+On these assumptions Dearly loses about £230,000 in year one, breaks even in year two and needs roughly £400,000 to £600,000 of funding. These are illustrative scenarios, not forecasts.
+
+|                             | Year 1                 | Year 2                   | Year 3                |
+| --------------------------- | ---------------------- | ------------------------ | --------------------- |
+| Consumer customers          | 15,000                 | 60,000                   | 150,000               |
+| Business accounts           | 40                     | 200                      | 500                   |
+| Orders                      | about 70,000           | about 330,000            | about 900,000         |
+| Contribution                | about £160,000         | about £770,000           | about £2.1m           |
+| Team, tools and acquisition | about £390,000         | about £600,000           | about £900,000        |
+| Result                      | loss of about £230,000 | profit of about £170,000 | profit of about £1.2m |
+
+- **Fixed costs.** Three people plus tools cost roughly £330,000 a year. Year two adds a fourth person.
+- **Break-even.** About 150,000 orders a year before acquisition spend.
+- **Acquisition.** £4 per new consumer customer, which depends on the unpaid channels working.
+- **Business accounts.** Each is assumed to send about 600 cards a year. Winning 200 accounts by year two with a small team is the most optimistic line.
+- **Most sensitive assumptions.** Acquisition cost, orders per customer, the share of orders approved in advance, and the pace of business sales.
+  If customers still order at the last minute, Dearly runs at next-day economics without Moonpig's scale, and the model fails. The share of orders approved in advance is the first number to prove.
+
+## Risks and compliance
+
+The largest commercial risk is that Moonpig or Card Factory copies the features; the largest operating risk is a card sent automatically after a death. None of the legal points below is legal advice, and each needs a lawyer.
+
+| Risk                                | What could happen                                                                                     | Response                                                                                                                   |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Incumbent response                  | Moonpig promotes its Economy post or matches prices; Card Factory adds personalised click and collect | Treat price as a tactic; build the reminder list, Inventory and business integrations, which are harder to copy            |
+| Last-minute ordering persists       | Advance share stays low and postage savings vanish                                                    | Early-approval discount, autopilot for chosen relationships, track advance share weekly                                    |
+| Life events                         | A card goes to someone who has died                                                                   | Life-event guard, yearly address confirmation, opt-in autopilot limited to chosen people                                   |
+| Quality variance                    | Partner printers differ                                                                               | One specification, qualification, inspection, scorecards, free reprints                                                    |
+| Royal Mail dependence               | Slower or dearer letters                                                                              | Advance buffer, tracked and pick-up alternatives, carrier mix for parcels                                                  |
+| Free-card abuse                     | Freebie hunters and duplicate accounts                                                                | Customer pays postage, verified phone or payment card, reminder dates required                                             |
+| Partner concentration               | A few florists supply most referrals                                                                  | Many small partners, equal commission terms both ways                                                                      |
+| Reminders do not reach the customer | Emails land in spam or go unopened, so proposals are never seen and orders stay last-minute           | Authenticated sending domain, inbox monitoring, push and opt-in text as back-ups, delivery and open rates tracked per step |
+
+### Compliance list
+
+- **Automated orders.** Clear consent in advance. New UK subscription rules bring reminder notices, easy cancellation and cooling-off periods; most sources expect them around spring 2027 ([Ashurst note](https://www.ashurstperkinscoie.com/en/insights/click-subscribe-comply-preparing-for-the-uks-new-subscription-contract-regime/)), and the date should be checked.
+- **Personal data.** Recipients and imported contacts are third parties. Market to a recipient only after they opt in. Handwriting, signatures and voice recordings need secure storage and deletion on request.
+- **User content.** Video, audio and drawings bring duties on harmful and illegal content. Screen uploads, offer a report button, and get advice on how UK online safety law applies to private card links.
+- **Voice.** Never clone another person's voice. Clone the sender's own only with explicit consent.
+- **Designs.** Licence terms for every source, labels on AI-made designs, blocks on brand and character prompts, licensed music only.
+- **App stores.** Moonpig says it cannot offer eCards in its apps ([eCard FAQ](https://help.moonpig.com/en/articles/318717-ecard-faqs)). Sell digital cards and credits on the web.
+- **Pricing display.** Show the full price, including delivery, before checkout.
+- **AI disclosure.** Callers are told the voice agent is an AI.
+- **Reminder messages.** Reminders the customer asked for are service messages; offers are marketing and need separate consent and an unsubscribe. Text messages need their own opt-in. Message links never approve an order without a confirm screen.
+
+## Milestones and measures
+
+The first year runs in three stages: prove the pilot with business accounts, launch to consumers, then add gifts and the Automate plan.
+
+| Period         | Milestones                                                                                                                                                |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Months 0 to 3  | Pilot app built, with reminder emails live; two printers qualified; five business pilot accounts; two florist pilots; core design collection commissioned |
+| Months 3 to 6  | Consumer launch with the free first card; autopilot; pick-up pilot in one city; community ranges; creator marketplace open                                |
+| Months 6 to 12 | Gifts and flowers through partners; Automate plan; rich eCards with narration and video; second wave of printers and florists                             |
+| Year 2         | Quarterly parcels, wholesale to shops, a second country                                                                                                   |
+
+### Measures
+
+| Measure                                               | Why it matters                               | Target                                      |
+| ----------------------------------------------------- | -------------------------------------------- | ------------------------------------------- |
+| Share of orders approved in advance                   | Drives postage cost and the whole model      | 70%                                         |
+| Proposal-to-order rate                                | The core claim against Moonpig's roughly 13% | Above 30%                                   |
+| Orders per customer a year                            | Lifetime value                               | 4 or more                                   |
+| Reminder dates per customer                           | The asset                                    | 8 or more                                   |
+| On-time rate, advance and tracked                     | Guarantee cost                               | 98% or more                                 |
+| Reprint rate                                          | Quality                                      | Under 1%                                    |
+| Recipient sign-up rate                                | Free acquisition                             | 10% of cards                                |
+| Finish mix                                            | Margin                                       | 20 / 60 / 20                                |
+| Acquisition cost and payback                          | Discipline on spend                          | Under £5, within 12 months                  |
+| Orders per team member                                | The thesis                                   | Rising every quarter                        |
+| Reminder delivery and open rate                       | A proposal that is not seen cannot convert   | 98% delivered, 50% opened                   |
+| Reminder-to-order rate by step (21, 14, 7, 3, 1 days) | Shows which message drives early approval    | Most orders from the 21 and 14 day messages |
+
+Targets are starting points to test, not commitments.
+
+## What to validate before spending
+
+These checks decide whether the numbers in this plan hold, and none of them needs the product to exist.
+
+- [ ] Quotes from three trade printers and one specialist for Luxe and Giant, against the written specification
+- [ ] Quotes for board-backed mailers, lined envelopes and varnish or laminate
+- [ ] Royal Mail business account terms and the 2026 large-letter tariff
+- [ ] Moonpig's current Large and Giant card prices, and the price of its Economy post
+- [ ] Google keyword prices for the terms Dearly would bid on
+- [ ] Interviews with five to ten business buyers on price, HR integration and office drops
+- [ ] Conversations with five florists about the referral scheme and commission both ways
+- [ ] A test of digital pricing: £0.29 paired and £0.79 standalone against a free basic copy
+- [ ] A test of finish names, the Signature default and its price at £3.49, £3.99 and £4.49
+- [ ] What creators earn per card elsewhere, from a few Thortful sellers
+- [ ] The depth of Moonpig's Eid, Diwali, Vaisakhi and Hanukkah ranges
+- [ ] Legal advice on automated orders, recipient data, user content, voice and design licences
+- [ ] Email set-up: an authenticated sending domain, an inbox-placement test with the main mail providers, and legal advice on service against marketing messages
+- [ ] A trademark check on Dearly, Classic, Signature and Luxe
+
+## Sources
+
+- [Moonpig FY26 results](https://www.investegate.co.uk/announcement/rns/moonpig-group--moon/final-results/9635380)
+- [Moonpig FY25 at a glance](https://www.moonpig.group/media/exrfm4jc/at-a-glance-fy25-moonpig-group-plc.pdf)
+- [Moonpig FY24 annual report, strategic report](https://www.moonpig.group/media/guimundu/moonpig-ara24-full-strategic-report.pdf)
+- [Marketing Week on Moonpig's FY26 marketing spend](https://www.marketingweek.com/moonpig-doubles-down-marketing-revenue/)
+- [Moonpig delivery information](https://www.moonpig.com/uk/delivery-information/)
+- [Moonpig card sizes and stock](https://help.moonpig.com/en/articles/318238-what-size-are-your-cards)
+- [Moonpig contact page](https://help.moonpig.com/en/articles/318764-contact-customer-service)
+- [Moonpig eCard FAQ](https://help.moonpig.com/en/articles/318717-ecard-faqs)
+- [Moonpig for Business](https://www.moonpig.com/uk/business/)
+- [Royal Mail rates, Mailcoms](https://www.mailcoms.co.uk/current-royal-mail-postage-rates/)
+- [Salience florist industry report](https://salience.co.uk/report/florist-retailers-market-performance-report)
+- [Thortful royalties, Retail Times](https://retailtimes.co.uk/thortful-creates-12-million-in-royalties-for-its-community-of-creators/)
+- [Card royalty norms, Writers & Artists](https://www.writersandartists.co.uk/advice/illustrating-greeting-card-industry)
+- [2021 census religion figures](https://lawandreligionuk.com/2022/11/29/2021-census-for-england-wales-religious-affiliation/)
