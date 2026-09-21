@@ -100,6 +100,8 @@ Payments, printing, postage and carrier tracking, HR sync, florist systems, emai
 
 ## Documentation
 
+- `DEARLY_TECHNICAL.md`: every screen, rule, service, route, AI job and safeguard, in plain terms.
+- `DEARLY_BUSINESS.md`: the business model, the economics, the growth loops and the operating model.
 - `docs/architecture.md`: layers, data model, request flow, AI gateway.
 - `docs/pricing.md`: the canonical prices, costs and formulas, generated from the constants.
 - `docs/pricing-audit.md`: the pricing audit, disagreements found and screenshots of the verification.
