@@ -31,3 +31,16 @@ What was cut or deferred to ship the pilot, in priority order, with the reason.
 2. Recipient sign-in from `/r/[slug]` so the saved card is visible to the recipient in the browser.
 3. Prisma 7 upgrade (driver adapters, `prisma.config.ts`) once the toolchain settles; ADR 0001 records the decision to stay on 6.
 4. Real partner adapters behind feature flags: Stripe for payments, a print API for one printer, Royal Mail Click and Drop for labels.
+
+## Reminders and notifications (branch `feat/reminders-min`)
+
+The minimal layer schedules reminders into an outbox and simulates sending. Out of scope, in order:
+
+1. **Real email sending** behind the messaging adapter (the outbox rows already hold subject, text and html).
+2. **Tokenised approve links and a confirm screen**: today every message links to the card on Reminders and never approves anything.
+3. **Preferences and consent pages**, quiet hours, and per-channel opt-in; every message is `email` in the pilot.
+4. **SMS and push drivers**: the `channel` column allows them; no driver exists.
+5. **Business monthly digest** for organisations with scheduled batches.
+6. **Open and click tracking** and React email templates (the pilot renders plain HTML strings).
+7. **End-to-end tests and conformance group K** for reminders; the layer is covered by unit tests and hand checks only.
+8. **Rescheduling on a date change**: moving a proposal's date keeps its existing reminder dates; cancel and reschedule on `set_date`.

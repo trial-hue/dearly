@@ -53,6 +53,13 @@ export function ReminderCard({
               ? PICKUP_PROMISE
               : `Arrives by ${fmtDate(p.arrival)}`}
         </p>
+        {p.reminder?.lastSentAt || p.reminder?.nextAt ? (
+          <p className="mt-1 text-xs text-ink-2" data-testid="reminder-status">
+            {p.reminder.lastSentAt
+              ? `We emailed you on ${fmtDate(p.reminder.lastSentAt)}.${p.reminder.nextAt ? ` Next reminder ${fmtDate(p.reminder.nextAt)}.` : ''}`
+              : `First reminder goes on ${fmtDate(p.reminder.nextAt as string)}.`}
+          </p>
+        ) : null}
         {p.messageBy === 'ai' || p.madeBy === 'ai' ? (
           <p className="mt-1 text-xs font-semibold text-success">
             {p.messageBy === 'ai' ? 'Drafted for you' : `Picked for ${first}`}

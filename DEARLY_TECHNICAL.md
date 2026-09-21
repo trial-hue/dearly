@@ -163,6 +163,10 @@ Approval is blocked while the address has not been confirmed for 365 days, excep
 
 First card free: an account with no printed order yet and at least three reminder dates has its first Regular Classic or Signature card at a card price of 0; delivery, the digital copy and gifts are charged. The flag is decided by the service and is not a field the client can set.
 
+### 6.4a Reminders and the outbox
+
+Every proposal schedules reminders at 21, 14, 7, 3 and 1 days before the occasion (`scheduleFor` in `src/domain/notifications.ts`; steps already past are dropped, a paused person gets none). Each reminder is a finished message: the recipient's first name, the occasion, the arrival promise, every price line and the total, all read from the proposal's quote, with a link to that card on Reminders. It never approves anything and carries no surname, address or postcode. Approving or skipping cancels the remaining reminders; pausing a person cancels theirs; a recovered delay sends a transactional message at once. Sending is simulated: messages sit in the `Notification` table and HQ's Outbox (`/hq/outbox`) marks due ones as sent, or jumps the clock forward seven days. Each proposal card on Reminders shows when it was last emailed and when the next reminder goes, and Operations counts reminders scheduled, sent, and orders approved within 48 hours of one. Every hook is best-effort: a failure in the outbox never stops an approval, skip, pause or delay.
+
 ### 6.5 Calendar
 
 `nextDate` resolves an occasion to the next date on or after today: an ad hoc date as given; a moving feast from the table (Diwali, Hanukkah, Eid, Mother's Day, through 2029); a fixed date (Christmas, Valentine's, Women's Day); or a month-day rolled forward, with 29 February falling on the last day of February in other years. Days are counted in calendar days across daylight-saving changes.

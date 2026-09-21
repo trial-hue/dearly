@@ -2,6 +2,7 @@ import { STAMPS, economics, forecast, toPence, type Actor } from '@/domain';
 import { prisma } from '@/server/db';
 
 import * as decisions from './decisionLog';
+import { reminderCounters } from './notifications';
 import { printerScores } from './orders';
 import { getSettings } from './settings';
 
@@ -21,6 +22,9 @@ export interface Counters {
   batches: number;
   referrals: number;
   openJobs: number;
+  remindersScheduled: number;
+  remindersSent: number;
+  approvedWithin48h: number;
 }
 
 export async function counters(accountId: string): Promise<Counters> {
@@ -79,6 +83,7 @@ export async function counters(accountId: string): Promise<Counters> {
     batches,
     referrals,
     openJobs,
+    ...(await reminderCounters(accountId)),
   };
 }
 

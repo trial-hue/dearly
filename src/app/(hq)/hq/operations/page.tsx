@@ -175,6 +175,9 @@ export default async function OperationsPage() {
           value={c.recipientsJoined}
           note={`${c.referrals} florist referrals, ${c.batches} batches`}
         />
+        <Stat label="Reminders scheduled" value={c.remindersScheduled} note="in the outbox" />
+        <Stat label="Reminders sent" value={c.remindersSent} note="simulated email" />
+        <Stat label="Approved within 48h of a reminder" value={c.approvedWithin48h} note="orders" />
       </div>
 
       <h2 className="section-title">13-week forecast</h2>
