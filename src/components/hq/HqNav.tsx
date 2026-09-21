@@ -13,7 +13,7 @@ const LINKS = [
 export function HqNav() {
   const path = usePathname();
   return (
-    <nav aria-label="HQ" className="flex items-center gap-1">
+    <nav aria-label="HQ" className="flex flex-wrap items-center gap-1">
       {LINKS.map((l) => (
         <Link
           key={l.href}
