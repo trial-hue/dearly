@@ -7,7 +7,9 @@ RUN apk add --no-cache openssl libc6-compat && corepack enable
 WORKDIR /app
 
 FROM base AS deps
-COPY package.json pnpm-lock.yaml ./
+# pnpm-workspace.yaml carries the overrides and allowBuilds recorded in the lockfile; without it
+# a frozen install fails with ERR_PNPM_LOCKFILE_CONFIG_MISMATCH.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY prisma ./prisma
 RUN pnpm install --frozen-lockfile
 
@@ -15,10 +17,14 @@ FROM base AS build
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Build-time placeholders only; real values arrive through the environment at run time.
-ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
-ENV SESSION_SECRET=build-time-placeholder-secret-not-used-at-runtime
-RUN pnpm prisma generate && pnpm build && pnpm build:worker
+# Build-time placeholders only, scoped to this RUN so they are not baked into any layer's
+# environment; real values arrive through the environment at run time.
+RUN DATABASE_URL=postgresql://build:build@localhost:5432/build \
+    SESSION_SECRET=build-time-placeholder-secret-not-used-at-runtime \
+    pnpm prisma generate && \
+    DATABASE_URL=postgresql://build:build@localhost:5432/build \
+    SESSION_SECRET=build-time-placeholder-secret-not-used-at-runtime \
+    pnpm build && pnpm build:worker
 
 FROM node:24-alpine AS run
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
