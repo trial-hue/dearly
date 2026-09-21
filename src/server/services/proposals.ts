@@ -41,6 +41,7 @@ import { json } from '@/server/json';
 
 import * as decisions from './decisionLog';
 import { mediaUrl } from './media';
+import * as notifications from './notifications';
 import { toOccasionLike } from './people';
 import { getSettings } from './settings';
 
@@ -94,6 +95,8 @@ export interface ProposalView {
   approvable: boolean;
   blockReason: 'address_stale' | null;
   orderId: string | null;
+  /** When the customer was last reminded about this card and when the next reminder goes. */
+  reminder?: notifications.ReminderSummary | null;
 }
 
 export function toView(
@@ -138,6 +141,7 @@ export function toView(
     approvable: row.status === 'proposed' && check.ok,
     blockReason: check.ok ? null : check.reason,
     orderId: row.orders?.[0]?.id ?? null,
+    reminder: null,
   };
 }
 
@@ -184,7 +188,66 @@ export async function ensureProposals(accountId: string, today: Date): Promise<n
     job: 'proposals',
     summary: `Created ${drafts.length} ${drafts.length === 1 ? 'proposal' : 'proposals'} from the reminder rules`,
   });
+  // Reminders for the new proposals; a failure here never breaks proposal creation.
+  try {
+    for (const d of drafts) {
+      const view = await getProposal(d.key, today);
+      if (view) await notifications.scheduleForProposal(reminderInput(view, accountId, today));
+    }
+  } catch {
+    // the outbox is best-effort
+  }
   return drafts.length;
+}
+
+/** Attach reminder dates to views. Never throws: a failure leaves the field null. */
+async function withReminders(views: ProposalView[]): Promise<ProposalView[]> {
+  try {
+    const summary = await notifications.summaryForKeys(views.map((v) => v.key));
+    return views.map((v) => ({ ...v, reminder: summary.get(v.key) ?? null }));
+  } catch {
+    return views;
+  }
+}
+
+function reminderInput(
+  view: ProposalView,
+  accountId: string,
+  today: Date,
+): notifications.ReminderInput {
+  return {
+    accountId,
+    proposalKey: view.key,
+    proposalId: view.id,
+    firstName: view.person.name.includes(' and ')
+      ? view.person.name
+      : (view.person.name.split(' ')[0] ?? view.person.name),
+    occasionType: view.occasionType,
+    dueDate: view.dueDate,
+    arrival: view.arrival,
+    mode: view.card.mode,
+    quote: view.quote,
+    paused: view.person.paused,
+    today,
+  };
+}
+
+/** Schedule reminders for open proposals that have none yet. Never throws. */
+export async function backfillReminders(accountId: string, today: Date): Promise<number> {
+  try {
+    const rows = await prisma.proposal.findMany({
+      where: { person: { accountId }, status: 'proposed' },
+      select: { key: true },
+    });
+    let n = 0;
+    for (const r of rows) {
+      const view = await getProposal(r.key, today);
+      if (view) n += await notifications.scheduleForProposal(reminderInput(view, accountId, today));
+    }
+    return n;
+  } catch {
+    return 0;
+  }
 }
 
 async function withAges(views: ProposalView[]): Promise<ProposalView[]> {
@@ -221,7 +284,7 @@ export async function listProposals(accountId: string, today: Date): Promise<Tod
     orderBy: { dueDate: 'asc' },
   });
   const free = await firstCardFreeFor(accountId);
-  const views = await withAges(rows.map((r) => toView(r, today, costs, free)));
+  const views = await withReminders(await withAges(rows.map((r) => toView(r, today, costs, free))));
   const people = await prisma.person.findMany({
     where: { accountId },
     include: { occasions: true },
@@ -267,9 +330,9 @@ export async function getProposal(key: string, today: Date): Promise<ProposalVie
   });
   if (!row) return null;
   const { costs } = await getSettings();
-  const [view] = await withAges([
-    toView(row, today, costs, await firstCardFreeFor(row.person.accountId)),
-  ]);
+  const [view] = await withReminders(
+    await withAges([toView(row, today, costs, await firstCardFreeFor(row.person.accountId))]),
+  );
   return view ?? null;
 }
 
@@ -450,6 +513,11 @@ export async function approveProposal(
   });
   await prisma.proposal.update({ where: { key }, data: { status: 'approved' } });
   if (code) await markGuaranteeCodeUsed(code.recoveryId, code.code, order.id);
+  try {
+    await notifications.cancelForProposal(key);
+  } catch {
+    // the outbox is best-effort
+  }
 
   const modeLabel =
     card.mode === 'ecard'
@@ -503,6 +571,11 @@ export async function skipProposal(key: string): Promise<boolean> {
   const row = await prisma.proposal.findUnique({ where: { key }, include: { person: true } });
   if (!row || row.status !== 'proposed') return false;
   await prisma.proposal.update({ where: { key }, data: { status: 'skipped' } });
+  try {
+    await notifications.cancelForProposal(key);
+  } catch {
+    // the outbox is best-effort
+  }
   await decisions.record({
     actor: 'person',
     job: 'skip',
@@ -554,6 +627,12 @@ export async function createAdhocProposal(
     job: 'new_card',
     summary: `Added a ${TITLES[input.type].toLowerCase()} card for ${person.name} on ${input.date}`,
   });
+  try {
+    const created = await getProposal(draft.key, today);
+    if (created) await notifications.scheduleForProposal(reminderInput(created, accountId, today));
+  } catch {
+    // the outbox is best-effort
+  }
   return getProposal(draft.key, today);
 }
 

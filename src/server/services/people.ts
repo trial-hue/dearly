@@ -15,6 +15,7 @@ import {
 import { prisma } from '@/server/db';
 
 import * as decisions from './decisionLog';
+import * as notifications from './notifications';
 
 export function toOccasionLike(o: Occasion): OccasionLike {
   return {
@@ -140,6 +141,11 @@ export async function pausePerson(id: string, reason: string, by: Actor, today: 
     where: { personId: id, status: 'proposed' },
     data: { status: 'withdrawn' },
   });
+  try {
+    await notifications.cancelForPerson(id);
+  } catch {
+    // the outbox is best-effort
+  }
   await decisions.record({
     actor: by,
     job: 'life_event',

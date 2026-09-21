@@ -437,5 +437,14 @@ export async function seedDemo(prisma: PrismaClient, opts: SeedOptions = {}): Pr
       ],
     });
   }
+  // Reminders for any open proposal without them (a fresh reset has none yet; the Reminders
+  // page creates proposals and schedules their reminders on first load). Never throws.
+  try {
+    const { backfillReminders } = await import('@/server/services/proposals');
+    const n = await backfillReminders(DEMO_ACCOUNT_ID, today);
+    if (n) log(`scheduled ${n} reminders`);
+  } catch {
+    // best-effort
+  }
   log('seed complete');
 }

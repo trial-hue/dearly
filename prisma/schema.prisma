@@ -328,3 +328,23 @@ model Setting {
   value     Json
   updatedAt DateTime @updatedAt
 }
+
+/// A reminder or transactional message held in the outbox (sending is simulated in the pilot).
+model Notification {
+  id           String    @id @default(cuid())
+  accountId    String
+  proposalKey  String?
+  orderId      String?
+  channel      String    // email | sms | push
+  step         String    // d21 | d14 | d7 | d3 | d1 | recovery | recipient
+  subject      String
+  html         String
+  text         String
+  scheduledFor DateTime
+  sentAt       DateTime?
+  status       String    @default("scheduled") // scheduled | sent | cancelled
+  createdAt    DateTime  @default(now())
+
+  @@index([accountId, status, scheduledFor])
+  @@index([proposalKey])
+}

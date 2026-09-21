@@ -35,6 +35,7 @@ import { prisma } from '@/server/db';
 import { json } from '@/server/json';
 
 import * as decisions from './decisionLog';
+import * as notifications from './notifications';
 import { toOccasionLike } from './people';
 import { SENDER, parseCard } from './proposals';
 
@@ -389,6 +390,19 @@ export async function delayOrder(
   });
   await prisma.order.update({ where: { id: row.id }, data: { delayed: true } });
   await decisions.recordMany(log);
+  try {
+    await notifications.sendRecovery({
+      id: row.id,
+      accountId: row.accountId,
+      recipientFirstName: row.recipientName.includes(' and ')
+        ? row.recipientName
+        : (row.recipientName.split(' ')[0] ?? row.recipientName),
+      totalPence: row.totalPence,
+      actions: actions.map((a) => ({ label: a.label })),
+    });
+  } catch {
+    // the outbox is best-effort
+  }
   return getOrder(row.id, today);
 }
 

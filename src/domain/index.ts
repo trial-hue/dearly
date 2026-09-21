@@ -17,3 +17,4 @@ export * from './lifeEvent';
 export * from './agentRules';
 export * from './sanitiseSvg';
 export * from './schemas';
+export * from './notifications';
